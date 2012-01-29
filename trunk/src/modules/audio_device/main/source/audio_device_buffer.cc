@@ -491,7 +491,7 @@ WebRtc_Word32 AudioDeviceBuffer::SetRecordedBuffer(const WebRtc_Word8* audioBuff
     if (_recChannel == AudioDeviceModule::kChannelBoth)
     {
         // (default) copy the complete input buffer to the local buffer
-#if 0//_DEBUG
+#if 1//_DEBUG
         memcpy(&_recBuffer[0], audioBuffer, _recSize);
 #else
 		WebRtc_Word16* ptr16Out = (WebRtc_Word16*)&_recBuffer[0];

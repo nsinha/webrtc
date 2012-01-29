@@ -438,7 +438,7 @@ WebRtc_Word32 VoEBaseImpl::NeedMorePlayData(
 		_outputMixerPtr->GetAudioFrame(& audioFrame_ptr);
 		/*nsinha hack replace the data with something known for time being*/
 		//this can happen at 8k or 16k so use corresponding preset buffer
-#if 1
+#if 0
 		pbuf=preset_buffer_8k;
 		buflenInBytes=32;
 		if(audioFrame_ptr->_payloadDataLengthInSamples==160)
