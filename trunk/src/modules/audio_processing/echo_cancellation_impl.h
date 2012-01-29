@@ -26,6 +26,15 @@ class EchoCancellationImpl : public EchoCancellation,
 
   int ProcessRenderAudio(const AudioBuffer* audio);
   int ProcessCaptureAudio(AudioBuffer* audio);
+#if (DITECH_VERSION==1)
+#else
+#if (DITECH_VERSION==2)
+  virtual void set_processing_discontinuity(bool);		
+#else
+#error DITECH_VERSION undefined
+#endif
+#endif
+
 
   // EchoCancellation implementation.
   virtual bool is_enabled() const;
@@ -35,6 +44,14 @@ class EchoCancellationImpl : public EchoCancellation,
   // ProcessingComponent implementation.
   virtual int Initialize();
   virtual int get_version(char* version, int version_len_bytes) const;
+#if (DITECH_VERSION==1)
+#else
+#if (DITECH_VERSION==2)
+  virtual int bufferFarEnd_nsinha(const AudioBuffer* audio);		
+#else
+#error DITECH_VERSION undefined
+#endif
+#endif
 
  private:
   // EchoCancellation implementation.

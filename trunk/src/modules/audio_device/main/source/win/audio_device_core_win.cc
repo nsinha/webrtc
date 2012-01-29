@@ -3827,7 +3827,16 @@ DWORD AudioDeviceWindowsCore::DoCaptureThreadPollDMO()
                 _ptrAudioBuffer->SetRecordedBuffer(
                     reinterpret_cast<WebRtc_Word8*>(data),
                     kSamplesProduced);
+#if (DITECH_VERSION==1)
                 _ptrAudioBuffer->SetVQEData(0, 0, 0);
+#else
+#if (DITECH_VERSION==2)
+				_ptrAudioBuffer->SetVQEData(0, 0, 0,0);//nsinha fourth arg for processing continuity
+#else
+#error DITECH_VERSION undefined	
+#endif
+#endif
+			
 
                 _UnLock();  // Release lock while making the callback.
                 _ptrAudioBuffer->DeliverRecordedData();
@@ -4079,8 +4088,15 @@ DWORD AudioDeviceWindowsCore::DoCaptureThread()
                         _driftAccumulator += _sampleDriftAt48kHz;
                         const WebRtc_Word32 clockDrift = static_cast<WebRtc_Word32>(_driftAccumulator);
                         _driftAccumulator -= clockDrift;
-
+#if (DITECH_VERSION==1)
                         _ptrAudioBuffer->SetVQEData(_sndCardPlayDelay, sndCardRecDelay, clockDrift);
+#else
+#if (DITECH_VERSION==2)
+						_ptrAudioBuffer->SetVQEData(_sndCardPlayDelay, sndCardRecDelay, clockDrift,0);//nsinha fourth arg for processing continuity
+#else
+#error DITECH_VERSION undefined	
+#endif
+#endif
 
                         QueryPerformanceCounter(&t1);    // measure time: START
 

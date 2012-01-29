@@ -54,7 +54,8 @@ protected:
 class AudioTransport
 {
 public:
-    virtual int32_t RecordedDataIsAvailable(const char* audioSamples,
+#if (DITECH_VERSION==1)
+	virtual int32_t RecordedDataIsAvailable(const char* audioSamples,
                                             const uint32_t nSamples,
                                             const uint8_t nBytesPerSample,
                                             const uint8_t nChannels,
@@ -64,6 +65,21 @@ public:
                                             const uint32_t currentMicLevel,
                                             uint32_t& newMicLevel) = 0;   
 
+#else
+#if (DITECH_VERSION==2)
+	virtual int32_t RecordedDataIsAvailable(const char* audioSamples,
+                                            const uint32_t nSamples,
+                                            const uint8_t nBytesPerSample,
+                                            const uint8_t nChannels,
+                                            const uint32_t samplesPerSec,
+                                            const uint32_t totalDelayMS,
+                                            const int32_t clockDrift,
+                                            const uint32_t currentMicLevel,
+                                            uint32_t& newMicLevel,const bool processing_discontinuity) = 0; 
+#else
+#error DITECH_VERSION UNDEFINED
+#endif
+#endif
     virtual int32_t NeedMorePlayData(const uint32_t nSamples,
                                      const uint8_t nBytesPerSample,
                                      const uint8_t nChannels,

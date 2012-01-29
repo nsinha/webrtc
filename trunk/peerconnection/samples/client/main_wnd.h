@@ -152,6 +152,9 @@ class MainWnd : public MainWindow {
     LABEL1_ID,
     LABEL2_ID,
     LISTBOX_ID,
+	AEC_ID,
+	AGC_ID,
+	ANC_ID,
   };
 
   void OnPaint();
@@ -179,6 +182,12 @@ class MainWnd : public MainWindow {
   UI ui_;
   HWND wnd_;
   DWORD ui_thread_id_;
+  HWND aec_;
+  HWND label_aec;
+  HWND anc_;
+  HWND label_anc;
+  HWND agc_;
+  HWND label_agc;
   HWND edit1_;
   HWND edit2_;
   HWND label1_;

@@ -3181,7 +3181,7 @@ bool AudioDeviceWindowsWave::ThreadFunc(void* pThis)
 // ----------------------------------------------------------------------------
 //  ThreadProcess
 // ----------------------------------------------------------------------------
-
+#if (DITECH_VERSION==1)
 bool AudioDeviceWindowsWave::ThreadProcess()
 {
     WebRtc_UWord32 time(0);
@@ -3343,10 +3343,194 @@ bool AudioDeviceWindowsWave::ThreadProcess()
 
     return true;
 }
+#else
+#if (DITECH_VERSION==2)
 
+bool AudioDeviceWindowsWave::ThreadProcess()
+{
+    WebRtc_UWord32 time(0);
+    WebRtc_UWord32 playDiff(0);
+    WebRtc_UWord32 recDiff(0);
+
+    LONGLONG playTime(0);
+    LONGLONG recTime(0);
+
+    switch (_timeEvent.Wait(1000))
+    {
+    case kEventSignaled:
+        break;
+    case kEventError:
+        WEBRTC_TRACE(kTraceWarning, kTraceAudioDevice, _id, "EventWrapper::Wait() failed => restarting timer");
+        _timeEvent.StopTimer();
+        _timeEvent.StartTimer(true, TIMER_PERIOD_MS);
+        return true;
+    case kEventTimeout:
+        return true;
+    }
+
+    time = AudioDeviceUtility::GetTimeInMS();
+
+    if (_startPlay)
+    {
+        if (PrepareStartPlayout() == 0)
+        {
+            _prevTimerCheckTime = time;
+            _prevPlayTime = time;
+            _startPlay = false;
+            _playing = true;
+            _playStartEvent.Set();
+        }
+    }
+
+    if (_startRec)
+    {
+        if (PrepareStartRecording() == 0)
+        {
+            _prevTimerCheckTime = time;
+            _prevRecTime = time;
+            _prevRecByteCheckTime = time;
+            _startRec = false;
+            _recording = true;
+            _recStartEvent.Set();
+        }
+    }
+
+    if (_playing)
+    {
+        playDiff = time - _prevPlayTime;
+    }
+
+    if (_recording)
+    {
+        recDiff = time - _prevRecTime;
+    }
+
+    if (_playing || _recording)
+    {
+        RestartTimerIfNeeded(time);
+    }
+
+    if (_playing &&
+        (playDiff > (WebRtc_UWord32)(_dTcheckPlayBufDelay - 1)) ||
+        (playDiff < 0))
+    {
+#if 0
+        Lock();
+        if (_playing)
+        {
+            if (PlayProc(playTime) == -1)
+            {
+                WEBRTC_TRACE(kTraceError, kTraceAudioDevice, _id, "PlayProc() failed");
+            }
+            _prevPlayTime = time;
+            if (playTime != 0)
+                _playAcc += playTime;
+        }
+        UnLock();
+#endif
+    }
+#if 0
+    if (_playing && (playDiff > 12))
+    {
+        // It has been a long time since we were able to play out, try to
+        // compensate by calling PlayProc again.
+        //
+        Lock();
+        if (_playing)
+        {
+            if (PlayProc(playTime))
+            {
+                WEBRTC_TRACE(kTraceError, kTraceAudioDevice, _id, "PlayProc() failed");
+            }
+            _prevPlayTime = time;
+            if (playTime != 0)
+                _playAcc += playTime;
+        }
+        UnLock();
+    }
+#endif
+
+    if (_recording &&
+       (recDiff > REC_CHECK_TIME_PERIOD_MS) ||
+       (recDiff < 0))
+    {
+        Lock();
+        if (_recording)
+        {
+            WebRtc_Word32 nRecordedBytes(0);
+            WebRtc_UWord16 maxIter(10);
+
+            // Deliver all availiable recorded buffers and update the CPU load measurement.
+            // We use a while loop here to compensate for the fact that the multi-media timer
+            // can sometimed enter a "bad state" after hibernation where the resolution is
+            // reduced from ~1ms to ~10-15 ms.
+            //
+            while ((nRecordedBytes = RecProc(recTime,recDiff>11)) > 0)
+            {
+                maxIter--;
+                _recordedBytes += nRecordedBytes;
+                if (recTime && _perfFreq.QuadPart)
+                {
+                    // Measure the average CPU load:
+                    // This is a simplified expression where an exponential filter is used:
+                    //   _avgCPULoad = 0.99 * _avgCPULoad + 0.01 * newCPU,
+                    //   newCPU = (recTime+playAcc)/f is time in seconds
+                    //   newCPU / 0.01 is the fraction of a 10 ms period
+                    // The two 0.01 cancels each other.
+                    // NOTE - assumes 10ms audio buffers.
+                    //
+                    _avgCPULoad = (float)(_avgCPULoad*.99 + (recTime+_playAcc)/(double)(_perfFreq.QuadPart));
+                    _playAcc = 0;
+                }
+                if (maxIter == 0)
+                {
+                    // If we get this message ofte, our compensation scheme is not sufficient.
+                    WEBRTC_TRACE(kTraceInfo, kTraceAudioDevice, _id, "failed to compensate for reduced MM-timer resolution");
+                }
+				Lock();
+				if (_playing)
+				{
+					if (PlayProc(playTime) == -1)
+					{
+						WEBRTC_TRACE(kTraceError, kTraceAudioDevice, _id, "PlayProc() failed");
+					}
+					_prevPlayTime = time;
+					if (playTime != 0)
+						_playAcc += playTime;
+				}
+				UnLock();
+            }
+
+            if (nRecordedBytes == -1)
+            {
+                WEBRTC_TRACE(kTraceError, kTraceAudioDevice, _id, "RecProc() failed");
+            }
+
+            _prevRecTime = time;
+
+            // Monitor the recording process and generate error/warning callbacks if needed
+            MonitorRecording(time);
+        }
+        UnLock();
+    }
+
+    if (!_recording)
+    {
+        _prevRecByteCheckTime = time;
+        _avgCPULoad = 0;
+    }
+
+    return true;
+}
+
+#else
+#error DITECH_VERSION UNDEFINED
+#endif
+#endif
 // ----------------------------------------------------------------------------
 //  RecProc
 // ----------------------------------------------------------------------------
+#if (DITECH_VERSION==1)
 
 WebRtc_Word32 AudioDeviceWindowsWave::RecProc(LONGLONG& consumedTime)
 {
@@ -3530,6 +3714,315 @@ WebRtc_Word32 AudioDeviceWindowsWave::RecProc(LONGLONG& consumedTime)
 
     return nBytesRecorded;
 }
+#else
+#if (DITECH_VERSION==2)
+//nsinha change the fn
+WebRtc_Word32 AudioDeviceWindowsWave::RecProc(LONGLONG& consumedTime,WebRtc_UWord32 lastCallDiff)
+{
+    MMRESULT res;
+    WebRtc_UWord32 bufCount(0),i;
+    WebRtc_UWord32 nBytesRecorded(0);
+	WebRtc_Word32 unfilled_buf_cnt_nsinha(0);
+	WebRtc_Word32 last_filled_buf_cnt_nsinha(0);
+
+
+    consumedTime = 0;
+
+	
+
+    
+
+    bufCount = _recBufCount;
+
+    // take mono/stereo mode into account when deriving size of a full buffer
+    const WebRtc_UWord16 bytesPerSample = 2*_recChannels;
+    const WebRtc_UWord32 fullBufferSizeInBytes = bytesPerSample * REC_BUF_SIZE_IN_SAMPLES;
+
+	//find the last buffer which is still unfilled
+	unfilled_buf_cnt_nsinha=bufCount;
+	if(_waveHeaderIn[bufCount].dwBytesRecorded <fullBufferSizeInBytes)
+		return 0;
+	while(1)
+	{
+		if(!(_waveHeaderIn[unfilled_buf_cnt_nsinha].dwFlags&WHDR_DONE))
+		//if((_waveHeaderIn[unfilled_buf_cnt_nsinha].dwBytesRecorded !=fullBufferSizeInBytes) || !(_waveHeaderIn[unfilled_buf_cnt_nsinha].dwFlags&WHDR_DONE))
+		{
+			break;
+		}
+		else
+		{
+			unfilled_buf_cnt_nsinha=(unfilled_buf_cnt_nsinha+1)%N_BUFFERS_IN;
+		}
+
+	}
+	last_filled_buf_cnt_nsinha=(unfilled_buf_cnt_nsinha-1)%N_BUFFERS_IN;
+	if(last_filled_buf_cnt_nsinha<0)
+		last_filled_buf_cnt_nsinha=N_BUFFERS_IN+last_filled_buf_cnt_nsinha;
+
+	
+
+	if(unfilled_buf_cnt_nsinha!=bufCount)
+	{
+		
+		// read number of recorded bytes for the given input-buffer
+		nBytesRecorded = _waveHeaderIn[bufCount].dwBytesRecorded;
+		//we need to ignore all buffers from bufCount to last_filled_buf_cnt_nsinha-1
+		if(last_filled_buf_cnt_nsinha!=bufCount)
+		{
+			i=bufCount;
+			while(1)
+			{
+				// reset counter so we can make new detection
+				_waveHeaderIn[i].dwBytesRecorded = 0;
+				//WEBRTC_TRACE(kTraceWarning, kTraceAudioDevice, _id, "%d enter the dragon bufCount=%d i=%d last_filled_buf_cnt_nsinha=%d",_waveHeaderIn[i].dwFlags, bufCount,i,last_filled_buf_cnt_nsinha);
+				
+				// return the utilized wave-header after certain delay (given by _recPutBackDelay)
+				res = waveInUnprepareHeader(_hWaveIn, &(_waveHeaderIn[i]), sizeof(WAVEHDR));
+				if (MMSYSERR_NOERROR != res)
+				{
+					WEBRTC_TRACE(kTraceWarning, kTraceAudioDevice, _id, "%dwaveInUnprepareHeader(%d) failed (err=%d) i=%d last_filled_buf_cnt_nsinha=%d",_waveHeaderIn[i].dwFlags, bufCount, res,i,last_filled_buf_cnt_nsinha);
+					TraceWaveInError(res);
+					return 0;
+
+				}
+				// ensure that the utilized header can be used again
+				res = waveInPrepareHeader(_hWaveIn, &(_waveHeaderIn[i]), sizeof(WAVEHDR));
+				if (res != MMSYSERR_NOERROR)
+				{
+					WEBRTC_TRACE(kTraceError, kTraceAudioDevice, _id, "waveInPrepareHeader(%d) failed (err=%d)", bufCount, res);
+					TraceWaveInError(res);
+					return -1;
+				}
+				// add the utilized buffer to the queue again
+				res = waveInAddBuffer(_hWaveIn, &(_waveHeaderIn[i]), sizeof(WAVEHDR));
+				if (res != MMSYSERR_NOERROR)
+				{
+					WEBRTC_TRACE(kTraceError, kTraceAudioDevice, _id, "waveInAddBuffer(%d) failed (err=%d) %d", bufCount, res,i);
+					TraceWaveInError(res);
+					
+				}
+				i=(i+1)%N_BUFFERS_IN;
+				if(i==((last_filled_buf_cnt_nsinha+1)%N_BUFFERS_IN))
+				{
+						bufCount=last_filled_buf_cnt_nsinha;
+						break;
+				}
+                
+			}//while(1)
+
+		}
+		else//if(last_filled_buf_cnt_nsinha!=bufCount)
+		{
+			// read number of recorded bytes for the given input-buffer
+			nBytesRecorded = _waveHeaderIn[bufCount].dwBytesRecorded;
+			// reset counter so we can make new detection
+			_waveHeaderIn[bufCount].dwBytesRecorded = 0;
+				
+			// return the utilized wave-header after certain delay (given by _recPutBackDelay)
+			res = waveInUnprepareHeader(_hWaveIn, &(_waveHeaderIn[bufCount]), sizeof(WAVEHDR));
+			if (MMSYSERR_NOERROR != res)
+			{
+				WEBRTC_TRACE(kTraceWarning, kTraceAudioDevice, _id, "%dwaveInUnprepareHeader(%d) failed (err=%d)  ",_waveHeaderIn[bufCount].dwFlags, bufCount, res);
+				TraceWaveInError(res);
+				return 0;
+
+			}
+			// ensure that the utilized header can be used again
+			res = waveInPrepareHeader(_hWaveIn, &(_waveHeaderIn[bufCount]), sizeof(WAVEHDR));
+			if (res != MMSYSERR_NOERROR)
+			{
+				WEBRTC_TRACE(kTraceError, kTraceAudioDevice, _id, "waveInPrepareHeader(%d) failed (err=%d)", bufCount, res);
+				TraceWaveInError(res);
+				return -1;
+			}
+			// add the utilized buffer to the queue again
+			res = waveInAddBuffer(_hWaveIn, &(_waveHeaderIn[bufCount]), sizeof(WAVEHDR));
+			if (res != MMSYSERR_NOERROR)
+			{
+				WEBRTC_TRACE(kTraceError, kTraceAudioDevice, _id, "waveInAddBuffer(%d) failed (err=%d)", bufCount, res);
+				TraceWaveInError(res);
+			}
+
+		}
+	}
+	else//if(unfilled_buf_cnt_nsinha!=bufCount)
+	{
+		// read number of recorded bytes for the given input-buffer
+		nBytesRecorded = _waveHeaderIn[bufCount].dwBytesRecorded;
+	}
+
+    if (nBytesRecorded == fullBufferSizeInBytes ||
+       (nBytesRecorded > 0))
+    {
+        WebRtc_Word32 msecOnPlaySide;
+        WebRtc_Word32 msecOnRecordSide;
+        WebRtc_UWord32 writtenSamples;
+        WebRtc_UWord32 playedSamples;
+        WebRtc_UWord32 readSamples, recSamples;
+        bool send = true;
+
+        WebRtc_UWord32 nSamplesRecorded = (nBytesRecorded/bytesPerSample);  // divide by 2 or 4 depending on mono or stereo
+
+        if (nBytesRecorded == fullBufferSizeInBytes)
+        {
+            _timesdwBytes = 0;
+        }
+        else
+        {
+            // Test if it is stuck on this buffer
+            _timesdwBytes++;
+            if (_timesdwBytes < 5)
+            {
+                // keep trying
+                return (0);
+            }
+            else
+            {
+                WEBRTC_TRACE(kTraceDebug, kTraceUtility, _id,"nBytesRecorded=%d => don't use", nBytesRecorded);
+                _timesdwBytes = 0;
+                send = false;
+            }
+        }
+
+        // store the recorded buffer (no action will be taken if the #recorded samples is not a full buffer)
+		//WEBRTC_TRACE(kTraceWarning, kTraceUtility, _id,"unfilled_buf_cnt_nsinha=%d bufCount=%d %d", unfilled_buf_cnt_nsinha,bufCount,last_filled_buf_cnt_nsinha);
+        _ptrAudioBuffer->SetRecordedBuffer(_waveHeaderIn[bufCount].lpData, nSamplesRecorded);
+
+        // update #samples read
+        _read_samples += nSamplesRecorded;
+
+        // Check how large the playout and recording buffers are on the sound card.
+        // This info is needed by the AEC.
+        //
+        msecOnPlaySide = GetPlayoutBufferDelay(writtenSamples, playedSamples);
+        msecOnRecordSide = GetRecordingBufferDelay(readSamples, recSamples);
+
+        // If we use the alternative playout delay method, skip the clock drift compensation
+        // since it will be an unreliable estimate and might degrade AEC performance.
+        WebRtc_Word32 drift = (_useHeader > 0) ? 0 : GetClockDrift(playedSamples, recSamples);
+
+        _ptrAudioBuffer->SetVQEData(msecOnPlaySide, msecOnRecordSide, drift,lastCallDiff);
+
+        // Store the play and rec delay values for video synchronization
+        _sndCardPlayDelay = msecOnPlaySide;
+        _sndCardRecDelay = msecOnRecordSide;
+
+        LARGE_INTEGER t1,t2;
+
+        if (send)
+        {
+            QueryPerformanceCounter(&t1);
+
+            // deliver recorded samples at specified sample rate, mic level etc. to the observer using callback
+            UnLock();
+            _ptrAudioBuffer->DeliverRecordedData();
+            Lock();
+
+            QueryPerformanceCounter(&t2);
+
+            if (InputSanityCheckAfterUnlockedPeriod() == -1)
+            {
+                // assert(false);
+                return -1;
+            }
+        }
+
+        if (_AGC)
+        {
+            WebRtc_UWord32  newMicLevel = _ptrAudioBuffer->NewMicLevel();
+            if (newMicLevel != 0)
+            {
+                // The VQE will only deliver non-zero microphone levels when a change is needed.
+                WEBRTC_TRACE(kTraceStream, kTraceUtility, _id,"AGC change of volume: => new=%u", newMicLevel);
+
+                // We store this outside of the audio buffer to avoid 
+                // having it overwritten by the getter thread.
+                _newMicLevel = newMicLevel;
+                SetEvent(_hSetCaptureVolumeEvent);
+            }
+        }
+#if 0
+        // return utilized buffer to queue after specified delay (default is 4)
+        if (_recDelayCount > (_recPutBackDelay-1))
+        {
+            // deley buffer counter to compensate for "put-back-delay"
+            bufCount = (bufCount + N_BUFFERS_IN - _recPutBackDelay) % N_BUFFERS_IN;
+
+            // reset counter so we can make new detection
+            _waveHeaderIn[bufCount].dwBytesRecorded = 0;
+
+            // return the utilized wave-header after certain delay (given by _recPutBackDelay)
+            res = waveInUnprepareHeader(_hWaveIn, &(_waveHeaderIn[bufCount]), sizeof(WAVEHDR));
+            if (MMSYSERR_NOERROR != res)
+            {
+                WEBRTC_TRACE(kTraceWarning, kTraceAudioDevice, _id, "waveInUnprepareHeader(%d) failed (err=%d)", bufCount, res);
+                TraceWaveInError(res);
+            }
+
+            // ensure that the utilized header can be used again
+            res = waveInPrepareHeader(_hWaveIn, &(_waveHeaderIn[bufCount]), sizeof(WAVEHDR));
+            if (res != MMSYSERR_NOERROR)
+            {
+                WEBRTC_TRACE(kTraceError, kTraceAudioDevice, _id, "waveInPrepareHeader(%d) failed (err=%d)", bufCount, res);
+                TraceWaveInError(res);
+                return -1;
+            }
+
+            // add the utilized buffer to the queue again
+            res = waveInAddBuffer(_hWaveIn, &(_waveHeaderIn[bufCount]), sizeof(WAVEHDR));
+            if (res != MMSYSERR_NOERROR)
+            {
+                WEBRTC_TRACE(kTraceError, kTraceAudioDevice, _id, "waveInAddBuffer(%d) failed (err=%d)", bufCount, res);
+                TraceWaveInError(res);
+                if (_recPutBackDelay < 50)
+                {
+                    _recPutBackDelay++;
+                    WEBRTC_TRACE(kTraceError, kTraceAudioDevice, _id, "_recPutBackDelay increased to %d", _recPutBackDelay);
+                }
+                else
+                {
+                    if (_recError == 1)
+                    {
+                        WEBRTC_TRACE(kTraceWarning, kTraceUtility, _id, "pending recording error exists");
+                    }
+                    _recError = 1;  // triggers callback from module process thread
+                    WEBRTC_TRACE(kTraceError, kTraceUtility, _id, "kRecordingError message posted: _recPutBackDelay=%u", _recPutBackDelay);
+                }
+            }
+        }  // if (_recDelayCount > (_recPutBackDelay-1))
+
+        if (_recDelayCount < (_recPutBackDelay+1))
+        {
+            _recDelayCount++;
+        }
+#endif
+
+        // increase main buffer count since one complete buffer has now been delivered
+        _recBufCount=(bufCount+1)%N_BUFFERS_IN;
+		// count modulo N_BUFFERS_IN (0,1,2,...,(N_BUFFERS_IN-1),0,1,2,..)
+	    /*if (_recBufCount == N_BUFFERS_IN)
+		{
+			_recBufCount = 0;
+		}*/
+
+
+        if (send) {
+            // Calculate processing time
+            consumedTime = (int)(t2.QuadPart-t1.QuadPart);
+            // handle wraps, time should not be higher than a second
+            if ((consumedTime > _perfFreq.QuadPart) || (consumedTime < 0))
+                consumedTime = 0;
+        }
+
+    }  // if ((nBytesRecorded == fullBufferSizeInBytes))
+
+    return nBytesRecorded;
+}
+#else
+#error DITECH_VERSION UNDEFINED
+#endif
+#endif
+
 
 // ----------------------------------------------------------------------------
 //  PlayProc
@@ -3833,7 +4326,17 @@ WebRtc_Word32 AudioDeviceWindowsWave::MonitorRecording(const WebRtc_UWord32 time
         {
             WEBRTC_TRACE(kTraceWarning, kTraceUtility, _id, "pending recording error exists");
         }
-        _recError = 1;  // triggers callback from module process thread
+#if (DITECH_VERSION==1)
+		_recError = 1;  // triggers callback from module process thread
+#else
+#if (DITECH_VERSION==2)
+		
+#else
+#error DITECH_VERSION undefined
+#endif
+#endif
+
+        
         WEBRTC_TRACE(kTraceError, kTraceUtility, _id, "kRecordingError message posted: time-_prevRecByteCheckTime=%d", time - _prevRecByteCheckTime);
 
         _prevRecByteCheckTime = time;
@@ -3866,8 +4369,16 @@ WebRtc_Word32 AudioDeviceWindowsWave::RestartTimerIfNeeded(const WebRtc_UWord32 
             // For the cases where restart does not do the trick, we compensate for the reduced
             // resolution on both the recording and playout sides.
             WEBRTC_TRACE(kTraceWarning, kTraceUtility, _id, " timer issue detected => timer is restarted");
+#if (DITECH_VERSION==1)
             _timeEvent.StopTimer();
             _timeEvent.StartTimer(true, TIMER_PERIOD_MS);
+#else
+#if (DITECH_VERSION==2)
+
+#else
+#error DITECH_VERSION undefined
+#endif
+#endif
             // make sure timer gets time to start up and we don't kill/start timer serveral times over and over again
             _timerFaults = -20;
             _timerRestartAttempts++;

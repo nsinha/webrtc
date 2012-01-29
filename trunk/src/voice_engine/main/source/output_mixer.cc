@@ -513,6 +513,21 @@ int OutputMixer::StopRecordingPlayout()
     return 0;
 }
 
+#if (DITECH_VERSION==1)
+#else
+#if (DITECH_VERSION==2)
+//nsinha a new fn
+WebRtc_Word32 
+OutputMixer::GetAudioFrame(AudioFrame ** audioFrame)
+{
+	 *audioFrame = &_audioFrame;
+	 return 1;
+}		
+#else
+#error DITECH_VERSION undefined
+#endif
+#endif
+
 WebRtc_Word32 
 OutputMixer::GetMixedAudio(const WebRtc_Word32 desiredFreqHz,
                            const WebRtc_UWord8 channels,

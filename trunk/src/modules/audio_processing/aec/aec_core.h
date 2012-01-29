@@ -73,6 +73,14 @@ typedef struct {
     int farBufWritePos, farBufReadPos;
 
     int knownDelay;
+#if (DITECH_VERSION==1)
+#else
+#if (DITECH_VERSION==2)
+	int adaptIsOff;//nsinha this variable will control if adaptation of filter needs to de done.is turned off on discontinuity of time gap while calling.		
+#else
+#error DITECH_VERSION undefined
+#endif
+#endif
     int inSamples, outSamples;
     int delayEstCtr;
 
@@ -151,6 +159,8 @@ typedef struct {
     FILE *nearFile;
     FILE *outFile;
     FILE *outLinearFile;
+	FILE *filterFile0;
+	FILE *filterFile1;
 #endif
 } aec_t;
 

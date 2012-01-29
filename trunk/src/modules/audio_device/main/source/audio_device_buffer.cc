@@ -21,6 +21,8 @@
 #include "signal_processing_library.h"
 
 namespace webrtc {
+	//short preset_buffer_48k[96]={1200,1200,1200,1200,1200,1200,7809,7809,7809,7809,7809,7809,12000,12000,12000,12000,12000,12000,1289,1289,1289,1289,1289,1289,9000,9000,9000,9000,9000,9000,9001,9001,9001,9001,9001,9001,1800,1800,1800,1800,1800,1800,-1280,-1280,-1280,-1280,-1280,-1280,-2700,-2700,-2700,-2700,-2700,-2700,-6000,-6000,-6000,-6000,-6000,-6000,-12000,-12000,-12000,-12000,-12000,-12000,800,800,800,800,800,800,2000,2000,2000,2000,2000,2000,6000,6000,6000,6000,6000,6000,16000,16000,16000,16000,16000,16000,400,400,400,400,400,400};
+	short preset_buffer_48k[96]={1200,0,0,0,0,0,7809,0,0,0,0,0,12000,0,0,0,0,0,1289,0,0,0,0,0,9000,0,0,0,0,0,9001,0,0,0,0,0,1800,0,0,0,0,0,-1280,0,0,0,0,0,-2700,0,0,0,0,0,-6000,0,0,0,0,0,-12000,0,0,0,0,0,800,0,0,0,0,0,2000,0,0,0,0,0,6000,0,0,0,0,0,16000,0,0,0,0,0,400,0,0,0,0,0};
 
 // ----------------------------------------------------------------------------
 //  ctor
@@ -111,7 +113,7 @@ WebRtc_Word32 AudioDeviceBuffer::RegisterAudioCallback(AudioTransport* audioCall
 // ----------------------------------------------------------------------------
 //  InitPlayout
 // ----------------------------------------------------------------------------
-
+#if (DITECH_VERSION==1)
 WebRtc_Word32 AudioDeviceBuffer::InitPlayout()
 {
     WEBRTC_TRACE(kTraceMemory, kTraceAudioDevice, _id, "%s", __FUNCTION__);
@@ -126,11 +128,33 @@ WebRtc_Word32 AudioDeviceBuffer::InitPlayout()
 
     return 0;
 }
+#else
+#if (DITECH_VERSION==2)
+WebRtc_Word32 AudioDeviceBuffer::InitPlayout()
+{
+    WEBRTC_TRACE(kTraceMemory, kTraceAudioDevice, _id, "%s", __FUNCTION__);
+
+    CriticalSectionScoped lock(_critSect);
+
+    if (_measureDelay)
+    {
+        _EmptyList();
+        _lastPulseTime = AudioDeviceUtility::GetTimeInMS();
+    }
+	totalPlayedSamples=0;
+	total10msticks=0;
+    return 0;
+}
+#else
+#error DITECH_VERSION UNDEFINED
+#endif
+#endif
+
 
 // ----------------------------------------------------------------------------
 //  InitRecording
 // ----------------------------------------------------------------------------
-
+#if (DITECH_VERSION==1)
 WebRtc_Word32 AudioDeviceBuffer::InitRecording()
 {
     WEBRTC_TRACE(kTraceMemory, kTraceAudioDevice, _id, "%s", __FUNCTION__);
@@ -145,6 +169,27 @@ WebRtc_Word32 AudioDeviceBuffer::InitRecording()
 
     return 0;
 }
+#else
+#if (DITECH_VERSION==2)
+WebRtc_Word32 AudioDeviceBuffer::InitRecording()
+{
+    WEBRTC_TRACE(kTraceMemory, kTraceAudioDevice, _id, "%s", __FUNCTION__);
+
+    CriticalSectionScoped lock(_critSect);
+
+    if (_measureDelay)
+    {
+        _EmptyList();
+        _lastPulseTime = AudioDeviceUtility::GetTimeInMS();
+    }
+	totalRecordedSamples=0;
+    return 0;
+}
+#else
+#error DITECH_VERSION UNDEFINED
+#endif
+#endif
+
 
 // ----------------------------------------------------------------------------
 //  SetRecordingSampleRate
@@ -304,7 +349,7 @@ WebRtc_UWord32 AudioDeviceBuffer::NewMicLevel() const
 // ----------------------------------------------------------------------------
 //  SetVQEData
 // ----------------------------------------------------------------------------
-
+#if (DITECH_VERSION==1)
 WebRtc_Word32 AudioDeviceBuffer::SetVQEData(WebRtc_UWord32 playDelayMS, WebRtc_UWord32 recDelayMS, WebRtc_Word32 clockDrift)
 {
     if ((playDelayMS + recDelayMS) > 300)
@@ -318,6 +363,27 @@ WebRtc_Word32 AudioDeviceBuffer::SetVQEData(WebRtc_UWord32 playDelayMS, WebRtc_U
 
     return 0;
 }
+#else
+#if (DITECH_VERSION==2)
+//nsinha brought processing discontinity change
+WebRtc_Word32 AudioDeviceBuffer::SetVQEData(WebRtc_UWord32 playDelayMS, WebRtc_UWord32 recDelayMS, WebRtc_Word32 clockDrift,WebRtc_UWord32 lastCallDiff)
+{
+    if ((playDelayMS + recDelayMS) > 300)
+    {
+        WEBRTC_TRACE(kTraceNone, kTraceUtility, _id, "too long delay (play:%i rec:%i)", playDelayMS, recDelayMS, clockDrift);
+    }
+
+    _playDelayMS = playDelayMS;
+    _recDelayMS = recDelayMS;
+    _clockDrift = clockDrift;
+	(lastCallDiff==1)?processing_discontinuity=1:processing_discontinuity=0;
+
+    return 0;
+}
+#else
+#error DITECH_VERSION undefined
+#endif
+#endif
 
 // ----------------------------------------------------------------------------
 //  StartInputFileRecording
@@ -425,7 +491,16 @@ WebRtc_Word32 AudioDeviceBuffer::SetRecordedBuffer(const WebRtc_Word8* audioBuff
     if (_recChannel == AudioDeviceModule::kChannelBoth)
     {
         // (default) copy the complete input buffer to the local buffer
+#if 0//_DEBUG
         memcpy(&_recBuffer[0], audioBuffer, _recSize);
+#else
+		WebRtc_Word16* ptr16Out = (WebRtc_Word16*)&_recBuffer[0];
+		for (WebRtc_UWord32 i = 0; i < _recSize/2; i++)
+		{
+			*ptr16Out++=preset_buffer_48k[i%96];
+		}
+#endif
+		
     }
     else
     {
@@ -440,7 +515,11 @@ WebRtc_Word32 AudioDeviceBuffer::SetRecordedBuffer(const WebRtc_Word8* audioBuff
         // exctract left or right channel from input buffer to the local buffer
         for (WebRtc_UWord32 i = 0; i < _recSamples; i++)
         {
-            *ptr16Out = *ptr16In;
+#if !_DEBUG            
+	*ptr16Out = *ptr16In;
+#else
+			*ptr16Out = preset_buffer_48k[i%96];
+#endif
             ptr16Out++;
             ptr16In++;
             ptr16In++;
@@ -460,6 +539,7 @@ WebRtc_Word32 AudioDeviceBuffer::SetRecordedBuffer(const WebRtc_Word8* audioBuff
 //  DeliverRecordedData
 // ----------------------------------------------------------------------------
 
+#if (DITECH_VERSION==1)
 WebRtc_Word32 AudioDeviceBuffer::DeliverRecordedData()
 {
     CriticalSectionScoped lock(_critSectCb);
@@ -516,11 +596,83 @@ WebRtc_Word32 AudioDeviceBuffer::DeliverRecordedData()
 
     return 0;
 }
+#else
+#if (DITECH_VERSION==2)
+/*Nsinha This fn is modified to  calculate the recorded samples at generic audio driver level. This code gets hit in linux and
+windows*/
+WebRtc_Word32 AudioDeviceBuffer::DeliverRecordedData()
+{
+    CriticalSectionScoped lock(_critSectCb);
 
+    // Ensure that user has initialized all essential members
+    if ((_recSampleRate == 0)     ||
+        (_recSamples == 0)        ||
+        (_recBytesPerSample == 0) ||
+        (_recChannels == 0))
+    {
+        assert(false);
+        return -1;
+    }
+
+    if (_ptrCbAudioTransport == NULL)
+    {
+        WEBRTC_TRACE(kTraceWarning, kTraceAudioDevice, _id, "failed to deliver recorded data (AudioTransport does not exist)");
+        return 0;
+    }
+
+    WebRtc_Word32 res(0);
+    WebRtc_UWord32 newMicLevel(0);
+    WebRtc_UWord32 totalDelayMS = _playDelayMS +_recDelayMS;
+
+    if (_measureDelay)
+    {
+        CriticalSectionScoped lock(_critSect);
+
+        memset(&_recBuffer[0], 0, _recSize);
+        WebRtc_UWord32 time = AudioDeviceUtility::GetTimeInMS();
+        if (time - _lastPulseTime > 500)
+        {
+            _pulseList.PushBack(time);
+            _lastPulseTime = time;
+
+            WebRtc_Word16* ptr16 = (WebRtc_Word16*)&_recBuffer[0];
+            *ptr16 = 30000;
+        }
+    }
+
+    res = _ptrCbAudioTransport->RecordedDataIsAvailable(&_recBuffer[0],
+                                                        _recSamples,
+                                                        _recBytesPerSample,
+                                                        _recChannels,
+                                                        _recSampleRate,
+                                                        totalDelayMS,
+                                                        _clockDrift,
+                                                        _currentMicLevel,
+                                                        newMicLevel,processing_discontinuity);
+
+	totalRecordedSamples+=_recSamples;
+	if(totalRecordedSamples>32768*256)
+	{
+			totalRecordedSamples/=200;
+			totalPlayedSamples/=200;
+	}
+
+    if (res != -1)
+    {
+        _newMicLevel = newMicLevel;
+    }
+
+    return 0;
+}
+#else
+#error DITECH_VERSION undefined
+#endif
+#endif
 // ----------------------------------------------------------------------------
 //  RequestPlayoutData
 // ----------------------------------------------------------------------------
 
+#if (DITECH_VERSION==1)
 WebRtc_Word32 AudioDeviceBuffer::RequestPlayoutData(WebRtc_UWord32 nSamples)
 {
     {
@@ -605,6 +757,116 @@ WebRtc_Word32 AudioDeviceBuffer::RequestPlayoutData(WebRtc_UWord32 nSamples)
 
     return nSamplesOut;
 }
+#else
+#if (DITECH_VERSION==2)
+/*Nsinha This fn is modified to  calculate the playedOut samples at generic audio driver level. This code gets hit in linux and
+windows*/
+WebRtc_Word32 AudioDeviceBuffer::RequestPlayoutData(WebRtc_UWord32 nSamples)
+{
+    {
+        CriticalSectionScoped lock(_critSect);
+
+        // Ensure that user has initialized all essential members
+        if ((_playBytesPerSample == 0) ||
+            (_playChannels == 0)       ||
+            (_playSampleRate == 0))
+        {
+            assert(false);
+            return -1;
+        }
+
+        _playSamples = nSamples;
+        _playSize = _playBytesPerSample * nSamples;  // {2,4}*nSamples
+        if (_playSize > kMaxBufferSizeBytes)
+        {
+            assert(false);
+            return -1;
+        }
+
+        if (nSamples != _playSamples)
+        {
+            WEBRTC_TRACE(kTraceWarning, kTraceAudioDevice, _id, "invalid number of samples to be played out (%d)", nSamples);
+            return -1;
+        }
+    }
+
+    WebRtc_UWord32 nSamplesOut(0);
+
+    CriticalSectionScoped lock(_critSectCb);
+
+    if (_ptrCbAudioTransport == NULL)
+    {
+        WEBRTC_TRACE(kTraceWarning, kTraceAudioDevice, _id, "failed to feed data to playout (AudioTransport does not exist)");
+        return 0;
+    }
+
+    if (_ptrCbAudioTransport)
+    {
+        WebRtc_UWord32 res(0);
+
+        res = _ptrCbAudioTransport->NeedMorePlayData(_playSamples,
+                                                     _playBytesPerSample,
+                                                     _playChannels,
+                                                     _playSampleRate,
+                                                     &_playBuffer[0],
+                                                     nSamplesOut);
+        if (res != 0)
+        {
+            WEBRTC_TRACE(kTraceError, kTraceAudioDevice, _id, "NeedMorePlayData() failed");
+        }
+
+        // --- Experimental delay-measurement implementation
+        // *** not be used in released code ***
+
+        if (_measureDelay)
+        {
+            CriticalSectionScoped lock(_critSect);
+
+            WebRtc_Word16 maxAbs = WebRtcSpl_MaxAbsValueW16((const WebRtc_Word16*)&_playBuffer[0], (WebRtc_Word16)nSamplesOut*_playChannels);
+            if (maxAbs > 1000)
+            {
+                WebRtc_UWord32 nowTime = AudioDeviceUtility::GetTimeInMS();
+
+                if (!_pulseList.Empty())
+                {
+                    ListItem* item = _pulseList.First();
+                    if (item)
+                    {
+                        WebRtc_Word16 maxIndex = WebRtcSpl_MaxAbsIndexW16((const WebRtc_Word16*)&_playBuffer[0], (WebRtc_Word16)nSamplesOut*_playChannels);
+                        WebRtc_UWord32 pulseTime = item->GetUnsignedItem();
+                        WebRtc_UWord32 diff = nowTime - pulseTime + (10*maxIndex)/(nSamplesOut*_playChannels);
+                        WEBRTC_TRACE(kTraceInfo, kTraceAudioDevice, _id, "diff time in playout delay (%d)", diff);
+                    }
+                    _pulseList.PopFront();
+                }
+            }
+        }
+    }
+	totalPlayedSamples+=nSamplesOut;
+	if(totalPlayedSamples>32768*256)
+	{
+			totalRecordedSamples/=200;
+			totalPlayedSamples/=200;
+	}
+	total10msticks++;
+	if(total10msticks%100==0 && total10msticks)
+	{
+		//float skew;
+		WEBRTC_TRACE(kTraceWarning, kTraceAudioDevice, 3,"	Hello there:skew=%f",(float)totalRecordedSamples*1.0/totalPlayedSamples);
+		//WEBRTC_TRACE(kTraceWarning, kTraceAudioDevice, 3,"	Hello there:totalPlayedSamples=%f",(float)1.0*totalPlayedSamples);
+
+
+	}
+
+	//WEBRTC_TRACE(kTraceWarning, kTraceAudioDevice, 3,"Hello there:totalPlayedSamples=%lu\n",totalPlayedSamples);
+	//WEBRTC_TRACE(kTraceWarning, kTraceAudioDevice, 3,"Hello there:totalRecordedSamples=%lu\n",totalRecordedSamples);
+    return nSamplesOut;
+}
+
+#else
+#error DITECH_VERSION undefined
+#endif
+#endif
 
 // ----------------------------------------------------------------------------
 //  GetPlayoutData

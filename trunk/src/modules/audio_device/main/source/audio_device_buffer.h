@@ -25,10 +25,24 @@ const WebRtc_UWord32 kMaxBufferSizeBytes = 3840; // 10ms in stereo @ 96kHz
 
 class AudioDeviceObserver;
 class MediaFile;
-
+//nsinha change this to support processing_discontinuity
 class AudioDeviceBuffer
 {
 public:
+#if (DITECH_VERSION==1)
+
+#else
+#if (DITECH_VERSION==2)
+/*Nsinha brought a few apis for skew algorithm*/
+	WebRtc_UWord64 totalRecordedSamples;
+	WebRtc_UWord64 totalPlayedSamples;
+	WebRtc_UWord64 total10msticks;
+	bool processing_discontinuity;
+
+#else
+#error DITECH_VERSION undefined
+#endif
+#endif
     void SetId(WebRtc_UWord32 id);
     WebRtc_Word32 RegisterAudioCallback(AudioTransport* audioCallback);
 
@@ -49,7 +63,15 @@ public:
 
     WebRtc_Word32 SetRecordedBuffer(const WebRtc_Word8* audioBuffer, WebRtc_UWord32 nSamples);
     WebRtc_Word32 SetCurrentMicLevel(WebRtc_UWord32 level);
+#if (DITECH_VERSION==1)
     WebRtc_Word32 SetVQEData(WebRtc_UWord32 playDelayMS, WebRtc_UWord32 recDelayMS, WebRtc_Word32 clockDrift);
+#else
+#if (DITECH_VERSION==2)
+	WebRtc_Word32 SetVQEData(WebRtc_UWord32 playDelayMS, WebRtc_UWord32 recDelayMS, WebRtc_Word32 clockDrift,WebRtc_UWord32);
+#else
+#error DITECH_VERSION undefined
+#endif
+#endif
     WebRtc_Word32 DeliverRecordedData();
     WebRtc_UWord32 NewMicLevel() const;
 

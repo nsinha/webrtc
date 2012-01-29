@@ -179,8 +179,17 @@ private:
     void TraceWaveOutError(MMRESULT error) const;
     WebRtc_Word32 PrepareStartRecording();
     WebRtc_Word32 PrepareStartPlayout();
-
+#if (DITECH_VERSION==1)
     WebRtc_Word32 RecProc(LONGLONG& consumedTime);
+#else
+#if (DITECH_VERSION==2)
+	WebRtc_Word32 RecProc(LONGLONG& consumedTime,WebRtc_UWord32 lastCallDiff);
+#else
+#error DITECH_VERSION UNDEFINED
+#endif
+#endif
+	
+
     int PlayProc(LONGLONG& consumedTime);
 
     WebRtc_Word32 GetPlayoutBufferDelay(WebRtc_UWord32& writtenSamples, WebRtc_UWord32& playedSamples);

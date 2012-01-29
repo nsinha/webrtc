@@ -1378,7 +1378,19 @@ bool AudioDeviceDummy::RecThreadProcess()
         _ptrAudioBuffer->SetRecordedBuffer(_recBuffer, 160);
 
         // store vqe delay values
+#if (DITECH_VERSION==1)
         _ptrAudioBuffer->SetVQEData(0, 0, 0);
+#else
+#if (DITECH_VERSION==2)
+		_ptrAudioBuffer->SetVQEData(0, 0, 0,0);//nsinha fourth arg for processing continuity
+#else
+#error DITECH_VERSION undefined
+
+#endif
+#endif
+	
+
+	
 
         // deliver recorded samples at specified sample rate, mic level etc. to the observer using callback
         UnLock();

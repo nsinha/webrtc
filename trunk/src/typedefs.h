@@ -12,7 +12,7 @@
 
 #ifndef WEBRTC_TYPEDEFS_H_
 #define WEBRTC_TYPEDEFS_H_
-
+#define DITECH_VERSION 2
 // Reserved words definitions
 // TODO(andrew): Look at removing these.
 #define WEBRTC_EXTERN extern
@@ -81,7 +81,7 @@
 #endif
 
 #if defined(__SSE2__) || defined(_MSC_VER)
-#define WEBRTC_USE_SSE2
+//#define WEBRTC_USE_SSE2
 #endif
 
 #if defined(WEBRTC_TARGET_PC)

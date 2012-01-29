@@ -126,7 +126,8 @@ WebRtc_Word32 WebRtcAec_Init(void *aecInst,
 WebRtc_Word32 WebRtcAec_BufferFarend(void *aecInst,
                                      const WebRtc_Word16 *farend,
                                      WebRtc_Word16 nrOfSamples);
-
+/*nsinha*/
+void WebRtcAec_set_processing_discontinuity(void *aecInst,short state);
 /*
  * Runs the echo canceller on an 80 or 160 sample blocks of data.
  *

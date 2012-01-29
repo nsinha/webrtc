@@ -93,7 +93,7 @@ public:
     virtual int GetVersion(char version[1024]);
 
     virtual int LastError();
-
+#if (DITECH_VERSION==1)
     // AudioTransport
     virtual WebRtc_Word32
         RecordedDataIsAvailable(const WebRtc_Word8* audioSamples,
@@ -105,6 +105,26 @@ public:
                                 const WebRtc_Word32 clockDrift,
                                 const WebRtc_UWord32 currentMicLevel,
                                 WebRtc_UWord32& newMicLevel);
+
+#else
+#if (DITECH_VERSION==2)
+    // AudioTransport
+    virtual WebRtc_Word32
+        RecordedDataIsAvailable(const WebRtc_Word8* audioSamples,
+                                const WebRtc_UWord32 nSamples,
+                                const WebRtc_UWord8 nBytesPerSample,
+                                const WebRtc_UWord8 nChannels,
+                                const WebRtc_UWord32 samplesPerSec,
+                                const WebRtc_UWord32 totalDelayMS,
+                                const WebRtc_Word32 clockDrift,
+                                const WebRtc_UWord32 currentMicLevel,
+                                WebRtc_UWord32& newMicLevel,const bool processing_discontinuity);
+		
+#else
+#error DITECH_VERSION undefined
+#endif
+#endif
+
 
     virtual WebRtc_Word32 NeedMorePlayData(const WebRtc_UWord32 nSamples,
                                            const WebRtc_UWord8 nBytesPerSample,

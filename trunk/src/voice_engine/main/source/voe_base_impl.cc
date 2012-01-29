@@ -23,6 +23,10 @@
 #include "utility.h"
 #include "voe_errors.h"
 #include "voice_engine_impl.h"
+//short preset_buffer_16k[32]={1200,1200,7809,7809,12000,12000,1289,1289,9000,9000,9001,9001,1800,1800,-1280,-1280,-2700,-2700,-6000,-6000,-12000,-12000,800,800,2000,2000,6000,6000,16000,16000,400,400};
+short preset_buffer_16k[32]={1200,0,7809,0,12000,0,1289,0,9000,0,9001,0,1800,0,-1280,0,-2700,0,-6000,0,-12000,0,800,0,2000,0,6000,0,16000,0,4000,0};
+short preset_buffer_8k[16]={1200,7809,12000,1289,9000,9001,1800,-1280,-2700,-6000,-12000,800,2000,6000,16000,400};
+short preset_buffer_48k[96]={1200,0,0,0,0,0,7809,0,0,0,0,0,12000,0,0,0,0,0,1289,0,0,0,0,0,9000,0,0,0,0,0,9001,0,0,0,0,0,1800,0,0,0,0,0,-1280,0,0,0,0,0,-2700,0,0,0,0,0,-6000,0,0,0,0,0,-12000,0,0,0,0,0,800,0,0,0,0,0,2000,0,0,0,0,0,6000,0,0,0,0,0,16000,0,0,0,0,0,400,0,0,0,0,0};
 
 #if (defined(_WIN32) && defined(_DLL) && (_MSC_VER == 1400))
 // Fix for VS 2005 MD/MDd link problem
@@ -137,7 +141,7 @@ void VoEBaseImpl::OnWarningIsReported(const WarningCode warning)
         }
     }
 }
-
+#if (DITECH_VERSION==1)
 WebRtc_Word32 VoEBaseImpl::RecordedDataIsAvailable(
         const WebRtc_Word8* audioSamples,
         const WebRtc_UWord32 nSamples,
@@ -285,6 +289,199 @@ WebRtc_Word32 VoEBaseImpl::NeedMorePlayData(
 
     return 0;
 }
+#else
+#if (DITECH_VERSION==2)
+//nsinha change the fn to pass processing discontinuity
+WebRtc_Word32 VoEBaseImpl::RecordedDataIsAvailable(
+        const WebRtc_Word8* audioSamples,
+        const WebRtc_UWord32 nSamples,
+        const WebRtc_UWord8 nBytesPerSample,
+        const WebRtc_UWord8 nChannels,
+        const WebRtc_UWord32 samplesPerSec,
+        const WebRtc_UWord32 totalDelayMS,
+        const WebRtc_Word32 clockDrift,
+        const WebRtc_UWord32 currentMicLevel,
+        WebRtc_UWord32& newMicLevel,const bool processing_discontinuity)
+{
+    WEBRTC_TRACE(kTraceStream, kTraceVoice, VoEId(_instanceId, -1),
+                 "VoEBaseImpl::RecordedDataIsAvailable(nSamples=%u, "
+                     "nBytesPerSample=%u, nChannels=%u, samplesPerSec=%u, "
+                     "totalDelayMS=%u, clockDrift=%d, currentMicLevel=%u)",
+                 nSamples, nBytesPerSample, nChannels, samplesPerSec,
+                 totalDelayMS, clockDrift, currentMicLevel);
+
+    assert(_transmitMixerPtr != NULL);
+    assert(_audioDevicePtr != NULL);
+
+    bool isAnalogAGC(false);
+    WebRtc_UWord32 maxVolume(0);
+    WebRtc_UWord16 currentVoEMicLevel(0);
+    WebRtc_UWord32 newVoEMicLevel(0);
+
+    if (_audioProcessingModulePtr
+            && (_audioProcessingModulePtr->gain_control()->mode()
+                    == GainControl::kAdaptiveAnalog))
+    {
+        isAnalogAGC = true;
+    }
+
+    // Will only deal with the volume in adaptive analog mode
+    if (isAnalogAGC)
+    {
+        // Scale from ADM to VoE level range
+        if (_audioDevicePtr->MaxMicrophoneVolume(&maxVolume) == 0)
+        {
+            if (0 != maxVolume)
+            {
+                currentVoEMicLevel = (WebRtc_UWord16) ((currentMicLevel
+                        * kMaxVolumeLevel + (int) (maxVolume / 2))
+                        / (maxVolume));
+            }
+        }
+        // We learned that on certain systems (e.g Linux) the currentVoEMicLevel
+        // can be greater than the maxVolumeLevel therefore
+        // we are going to cap the currentVoEMicLevel to the maxVolumeLevel
+        // if it turns out that the currentVoEMicLevel is indeed greater
+        // than the maxVolumeLevel
+        if (currentVoEMicLevel > kMaxVolumeLevel)
+        {
+            currentVoEMicLevel = kMaxVolumeLevel;
+        }
+    }
+
+    // Keep track if the MicLevel has been changed by the AGC, if not,
+    // use the old value AGC returns to let AGC continue its trend,
+    // so eventually the AGC is able to change the mic level. This handles
+    // issues with truncation introduced by the scaling.
+    if (_oldMicLevel == currentMicLevel)
+    {
+        currentVoEMicLevel = (WebRtc_UWord16) _oldVoEMicLevel;
+    }
+
+    // Perform channel-independent operations
+    // (APM, mix with file, record to file, mute, etc.)
+    _transmitMixerPtr->PrepareDemux(audioSamples, nSamples, nChannels,
+                                    samplesPerSec,
+                                    (WebRtc_UWord16) totalDelayMS, clockDrift,processing_discontinuity,
+                                    currentVoEMicLevel);
+
+    // Copy the audio frame to each sending channel and perform
+    // channel-dependent operations (file mixing, mute, etc.) to prepare
+    // for encoding.
+    _transmitMixerPtr->DemuxAndMix();
+    // Do the encoding and packetize+transmit the RTP packet when encoding
+    // is done.
+    _transmitMixerPtr->EncodeAndSend();
+
+    // Will only deal with the volume in adaptive analog mode
+    if (isAnalogAGC)
+    {
+        // Scale from VoE to ADM level range
+        newVoEMicLevel = _transmitMixerPtr->CaptureLevel();
+        if (newVoEMicLevel != currentVoEMicLevel)
+        {
+            // Add (kMaxVolumeLevel/2) to round the value
+            newMicLevel = (WebRtc_UWord32) ((newVoEMicLevel * maxVolume
+                    + (int) (kMaxVolumeLevel / 2)) / (kMaxVolumeLevel));
+        }
+        else
+        {
+            // Pass zero if the level is unchanged
+            newMicLevel = 0;
+        }
+
+        // Keep track of the value AGC returns
+        _oldVoEMicLevel = newVoEMicLevel;
+        _oldMicLevel = currentMicLevel;
+    }
+
+    return 0;
+}
+/*Nsinha This fn is changed so that we buffer what exactly is going to the speaker.We will change the current rebuffering position 
+thats occuring right at place where far end is receieved to here where we are sending to speaker*/
+
+WebRtc_Word32 VoEBaseImpl::NeedMorePlayData(
+        const WebRtc_UWord32 nSamples,
+        const WebRtc_UWord8 nBytesPerSample,
+        const WebRtc_UWord8 nChannels,
+        const WebRtc_UWord32 samplesPerSec,
+        WebRtc_Word8* audioSamples,
+        WebRtc_UWord32& nSamplesOut)
+{
+    WEBRTC_TRACE(kTraceStream, kTraceVoice, VoEId(_instanceId, -1),
+                 "VoEBaseImpl::NeedMorePlayData(nSamples=%u, "
+                     "nBytesPerSample=%d, nChannels=%d, samplesPerSec=%u)",
+                 nSamples, nBytesPerSample, nChannels, samplesPerSec);
+
+    assert(_outputMixerPtr != NULL);
+
+    AudioFrame audioFrame;
+	AudioFrame *audioFrame_ptr=NULL;
+	AudioProcessing* apm;
+	int i;
+	short  *pbuf;
+	short buflenInBytes,looplen;
+
+    // Perform mixing of all active participants (channel-based mixing)
+    _outputMixerPtr->MixActiveChannels();
+
+    // Additional operations on the combined signal
+    _outputMixerPtr->DoOperationsOnCombinedSignal();
+
+	//buffer the data to far end buffer for echo cancellation purposes
+	//WebRtcAec_BufferFarend(void *aecInst, const WebRtc_Word16 *farend,
+    //WebRtc_Word16 nrOfSamples);
+	{
+		//void* my_handle = static_cast<void *>(handle(0));
+		apm=reinterpret_cast<AudioProcessing*> (_audioProcessingModulePtr);
+		
+		_outputMixerPtr->GetAudioFrame(& audioFrame_ptr);
+		/*nsinha hack replace the data with something known for time being*/
+		//this can happen at 8k or 16k so use corresponding preset buffer
+#if 1
+		pbuf=preset_buffer_8k;
+		buflenInBytes=32;
+		if(audioFrame_ptr->_payloadDataLengthInSamples==160)
+		{
+				pbuf=preset_buffer_16k;
+				buflenInBytes=64;
+		}
+		looplen=audioFrame_ptr->_payloadDataLengthInSamples*2;//in bytes
+		i=0;
+		while(looplen>0)
+		{
+				looplen-=buflenInBytes;
+				memcpy(&audioFrame_ptr->_payloadData[i],pbuf,buflenInBytes);
+				i+=buflenInBytes/2;
+		}
+#endif
+		apm->AnalyzeReverseStream_nsinha(audioFrame_ptr);
+    }
+
+    // Retrieve the final output mix (resampled to match the ADM)
+    _outputMixerPtr->GetMixedAudio(samplesPerSec, nChannels, audioFrame);
+
+    assert(nSamples == audioFrame._payloadDataLengthInSamples);
+    assert(samplesPerSec ==
+        static_cast<WebRtc_UWord32>(audioFrame._frequencyInHz));
+
+    // Deliver audio (PCM) samples to the ADM
+    memcpy(
+           (WebRtc_Word16*) audioSamples,
+           (const WebRtc_Word16*) audioFrame._payloadData,
+           sizeof(WebRtc_Word16) * (audioFrame._payloadDataLengthInSamples
+                   * audioFrame._audioChannel));
+
+    nSamplesOut = audioFrame._payloadDataLengthInSamples;
+
+    return 0;
+}		
+#else
+#error DITECH_VERSION undefined
+#endif
+#endif
+
+
 
 int VoEBaseImpl::RegisterVoiceEngineObserver(VoiceEngineObserver& observer)
 {

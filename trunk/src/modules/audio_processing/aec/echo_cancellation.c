@@ -14,9 +14,9 @@
 #include "echo_cancellation.h"
 
 #include <math.h>
-#ifdef WEBRTC_AEC_DEBUG_DUMP
+//#ifdef WEBRTC_AEC_DEBUG_DUMP
 #include <stdio.h>
-#endif
+//#endif
 #include <stdlib.h>
 #include <string.h>
 
@@ -153,6 +153,11 @@ WebRtc_Word32 WebRtcAec_Create(void **aecInst)
       aecpc->skewFile = fopen(filename, "wb");
       sprintf(filename, "aec_delay%d.dat", instance_count);
       aecpc->delayFile = fopen(filename, "wb");
+	  sprintf(filename, "aec_filter0%d.pcm", instance_count);
+      aecpc->aec->filterFile0 = fopen(filename, "wb");
+	  sprintf(filename, "aec_filter1%d.pcm", instance_count);
+      aecpc->aec->filterFile1 = fopen(filename, "wb");
+	  
       instance_count++;
     }
 #endif
@@ -173,6 +178,8 @@ WebRtc_Word32 WebRtcAec_Free(void *aecInst)
     fclose(aecpc->aec->nearFile);
     fclose(aecpc->aec->outFile);
     fclose(aecpc->aec->outLinearFile);
+	fclose(aecpc->aec->filterFile0);
+	fclose(aecpc->aec->filterFile1);
     fclose(aecpc->bufFile);
     fclose(aecpc->skewFile);
     fclose(aecpc->delayFile);
@@ -244,7 +251,16 @@ WebRtc_Word32 WebRtcAec_Init(void *aecInst, WebRtc_Word32 sampFreq, WebRtc_Word3
     aecpc->checkBuffSize = 1;
     aecpc->firstVal = 0;
 
-    aecpc->ECstartup = 1;
+#if (DITECH_VERSION==1)
+	aecpc->ECstartup = 1;
+#else
+#if (DITECH_VERSION==2)
+	aecpc->ECstartup = 0;//nsinha		
+#else
+#error DITECH_VERSION undefined
+#endif
+#endif
+    
     aecpc->bufSizeStart = 0;
     aecpc->checkBufSizeCtr = 0;
     aecpc->filtDelay = 0;
@@ -273,11 +289,29 @@ WebRtc_Word32 WebRtcAec_Init(void *aecInst, WebRtc_Word32 sampFreq, WebRtc_Word3
     return 0;
 }
 
+#if (DITECH_VERSION==1)
+#else
+#if (DITECH_VERSION==2)
+void WebRtcAec_set_processing_discontinuity(void *aecInst,short state)
+{
+	aecpc_t *aecpc = (aecpc_t *)aecInst;
+
+	if(state)
+		aecpc->aec->adaptIsOff+=2;
+	if(aecpc->aec->adaptIsOff>4)
+		aecpc->aec->adaptIsOff=4;
+
+
+}		
+#else
+#error DITECH_VERSION undefined
+#endif
+#endif
 // only buffer L band for farend
 WebRtc_Word32 WebRtcAec_BufferFarend(void *aecInst, const WebRtc_Word16 *farend,
     WebRtc_Word16 nrOfSamples)
 {
-    aecpc_t *aecpc = aecInst;
+    aecpc_t *aecpc = (aecpc_t *)aecInst;
     WebRtc_Word32 retVal = 0;
     short newNrOfSamples;
     short newFarend[MAX_RESAMP_LEN];
@@ -835,8 +869,17 @@ static int EstBufDelay(aecpc_t *aecpc, short msInSndCardBuf)
 
     nSampFar = WebRtcApm_get_buffer_size(aecpc->farendBuf);
     nSampSndCard = msInSndCardBuf * sampMsNb * aecpc->aec->mult;
+#if (DITECH_VERSION==1)
+	delayNew = nSampSndCard - nSampFar;
+#else
+#if (DITECH_VERSION==2)
+	delayNew = 0;//nSampSndCard - nSampFar;		
+#else
+#error DITECH_VERSION undefined
+#endif
+#endif
 
-    delayNew = nSampSndCard - nSampFar;
+    
 
     // Account for resampling frame delay
     if (aecpc->skewMode == kAecTrue && aecpc->resample == kAecTrue) {
@@ -844,11 +887,28 @@ static int EstBufDelay(aecpc_t *aecpc, short msInSndCardBuf)
     }
 
     if (delayNew < FRAME_LEN) {
-        WebRtcApm_FlushBuffer(aecpc->farendBuf, FRAME_LEN);
-        delayNew += FRAME_LEN;
-    }
+#if (DITECH_VERSION==1)
+		WebRtcApm_FlushBuffer(aecpc->farendBuf, FRAME_LEN);
+		delayNew += FRAME_LEN;
+#else
+#if (DITECH_VERSION==2)
+		
+#else
+#error DITECH_VERSION undefined
+#endif
+#endif
 
+        
+    }
+#if (DITECH_VERSION==1)
     aecpc->filtDelay = WEBRTC_SPL_MAX(0, (short)(0.8*aecpc->filtDelay + 0.2*delayNew));
+#else
+#if (DITECH_VERSION==2)
+	aecpc->filtDelay =0;
+#else
+#error DITECH_VERSION undefined
+#endif
+#endif
 
     diff = aecpc->filtDelay - aecpc->knownDelay;
     if (diff > 224) {
@@ -885,7 +945,17 @@ static int DelayComp(aecpc_t *aecpc)
 
     nSampFar = WebRtcApm_get_buffer_size(aecpc->farendBuf);
     nSampSndCard = aecpc->msInSndCardBuf * sampMsNb * aecpc->aec->mult;
-    delayNew = nSampSndCard - nSampFar;
+#if (DITECH_VERSION==2)
+	delayNew =0;
+#else
+#if (DITECH_VERSION==1)
+	delayNew = nSampSndCard - nSampFar;		
+#else
+#error DITECH_VERSION undefined
+#endif
+#endif
+
+    
 
     // Account for resampling frame delay
     if (aecpc->skewMode == kAecTrue && aecpc->resample == kAecTrue) {
@@ -899,7 +969,17 @@ static int DelayComp(aecpc_t *aecpc)
                     FRAME_LEN));
         nSampAdd = WEBRTC_SPL_MIN(nSampAdd, maxStuffSamp);
 
-        WebRtcApm_StuffBuffer(aecpc->farendBuf, nSampAdd);
+#if (DITECH_VERSION==1)
+	WebRtcApm_StuffBuffer(aecpc->farendBuf, nSampAdd);
+#else
+#if (DITECH_VERSION==2)
+		
+#else
+#error DITECH_VERSION undefined
+#endif
+#endif
+        
+
         aecpc->delayChange = 1; // the delay needs to be updated
     }
 

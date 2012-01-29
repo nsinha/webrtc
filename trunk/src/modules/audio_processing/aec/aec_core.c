@@ -321,6 +321,11 @@ static void FilterAdaptation(aec_t *aec, float *fft, float ef[2][PART_LEN1]) {
       aec->wfBuf[1][pos + j] += fft[2 * j + 1];
     }
   }
+  
+#ifdef WEBRTC_AEC_DEBUG_DUMP
+	fwrite(aec->wfBuf[0], sizeof(float), NR_PART * PART_LEN1, aec->filterFile0);
+	//fwrite(aec->wfBuf[1], sizeof(float), NR_PART * PART_LEN1, aec->filterFile1);
+#endif
 }
 
 static void OverdriveAndSuppress(aec_t *aec, float hNl[PART_LEN1],
@@ -410,6 +415,14 @@ int WebRtcAec_InitAec(aec_t *aec, int sampFreq)
     aec->inSamples = 0;
     aec->outSamples = 0;
     aec->knownDelay = 0;
+#if (DITECH_VERSION==1)
+#else
+#if (DITECH_VERSION==2)
+	aec->adaptIsOff=0;//nsinha this variable will control if adaptation of filter needs to de done.
+#else
+#error DITECH_VERSION undefined
+#endif
+#endif
 
     // Initialize buffers
     memset(aec->farBuf, 0, sizeof(aec->farBuf));
@@ -512,6 +525,15 @@ void WebRtcAec_ProcessFrame(aec_t *aec, const short *farend,
     short nearBlH[PART_LEN], outBlH[PART_LEN];
 
     int size = 0;
+#if (DITECH_VERSION==1)
+#else
+#if (DITECH_VERSION==2)
+		if(aec->adaptIsOff>0)
+		aec->adaptIsOff--;
+#else
+#error DITECH_VERSION undefined
+#endif
+#endif
 
     // initialize: only used for SWB
     memset(nearBlH, 0, sizeof(nearBlH));
@@ -759,7 +781,18 @@ static void ProcessBlock(aec_t *aec, const short *farend,
 
     // Scale error signal inversely with far power.
     WebRtcAec_ScaleErrorSignal(aec, ef);
+#if (DITECH_VERSION==1)
     WebRtcAec_FilterAdaptation(aec, fft, ef);
+#else
+#if (DITECH_VERSION==2)
+	if(aec->adaptIsOff==0)
+		WebRtcAec_FilterAdaptation(aec, fft, ef);
+#else
+#error DITECH_VERSION undefined
+#endif
+#endif
+
+
     NonLinearProcessing(aec, output, outputH);
 
     if (aec->metricsMode == 1) {

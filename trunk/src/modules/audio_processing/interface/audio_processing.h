@@ -170,6 +170,17 @@ class AudioProcessing : public Module {
   //
   // TODO(ajm): add const to input; requires an implementation fix.
   virtual int AnalyzeReverseStream(AudioFrame* frame) = 0;
+#if (DITECH_VERSION==1)
+#else
+#if (DITECH_VERSION==2)
+
+  virtual int AnalyzeReverseStream_nsinha(AudioFrame* frame) = 0;
+  virtual void set_processing_discontinuity(bool)=0;
+		
+#else
+#error DITECH_VERSION undefined
+#endif
+#endif
 
   // This must be called if and only if echo processing is enabled.
   //

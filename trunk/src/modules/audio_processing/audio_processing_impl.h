@@ -67,6 +67,15 @@ class AudioProcessingImpl : public AudioProcessing {
   virtual int num_reverse_channels() const;
   virtual int ProcessStream(AudioFrame* frame);
   virtual int AnalyzeReverseStream(AudioFrame* frame);
+#if (DITECH_VERSION==1)
+#else
+#if (DITECH_VERSION==2)
+  virtual int AnalyzeReverseStream_nsinha(AudioFrame* frame);
+  virtual void set_processing_discontinuity(bool);		
+#else
+#error DITECH_VERSION undefined
+#endif
+#endif
   virtual int set_stream_delay_ms(int delay);
   virtual int stream_delay_ms() const;
   virtual int StartDebugRecording(const char filename[kMaxFilenameSize]);
@@ -118,6 +127,14 @@ class AudioProcessingImpl : public AudioProcessing {
   int split_sample_rate_hz_;
   int samples_per_channel_;
   int stream_delay_ms_;
+#if (DITECH_VERSION==1)
+#else
+#if (DITECH_VERSION==2)
+	 bool was_discontinuity_set;	
+#else
+#error DITECH_VERSION undefined
+#endif
+#endif
   bool was_stream_delay_set_;
 
   int num_reverse_channels_;

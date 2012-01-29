@@ -70,6 +70,25 @@ EchoCancellationImpl::EchoCancellationImpl(const AudioProcessingImpl* apm)
     delay_logging_enabled_(false) {}
 
 EchoCancellationImpl::~EchoCancellationImpl() {}
+#if (DITECH_VERSION==1)
+#else
+#if (DITECH_VERSION==2)
+void EchoCancellationImpl::set_processing_discontinuity(bool state)
+{
+
+	// The ordering convention must be followed to pass to the correct AEC.
+  size_t handle_index = 0;
+  if(num_handles()==0)
+	  return;
+ Handle* my_handle = static_cast<Handle*>(handle(handle_index));
+	  WebRtcAec_set_processing_discontinuity(my_handle,state);
+
+}		
+#else
+#error DITECH_VERSION undefined
+#endif
+#endif
+
 
 int EchoCancellationImpl::ProcessRenderAudio(const AudioBuffer* audio) {
   if (!is_component_enabled()) {
@@ -234,6 +253,43 @@ int EchoCancellationImpl::enable_metrics(bool enable) {
 bool EchoCancellationImpl::are_metrics_enabled() const {
   return metrics_enabled_;
 }
+
+
+#if (DITECH_VERSION==2)
+
+int EchoCancellationImpl::bufferFarEnd_nsinha(const AudioBuffer* audio) {
+  if (!is_component_enabled()) {
+    return apm_->kNoError;
+  }
+
+  assert(audio->samples_per_split_channel() <= 160);
+  assert(audio->num_channels() == apm_->num_reverse_channels());
+
+  int err = apm_->kNoError;
+
+  // The ordering convention must be followed to pass to the correct AEC.
+  size_t handle_index = 0;
+  for (int i = 0; i < apm_->num_output_channels(); i++) {
+    for (int j = 0; j < audio->num_channels(); j++) {
+      Handle* my_handle = static_cast<Handle*>(handle(handle_index));
+      err = WebRtcAec_BufferFarend(
+          my_handle,
+          audio->low_pass_split_data(j),
+          static_cast<WebRtc_Word16>(audio->samples_per_split_channel()));
+
+      if (err != apm_->kNoError) {
+        return GetHandleError(my_handle);  // TODO(ajm): warning possible?
+      }
+
+      handle_index++;
+    }
+  }
+
+  return apm_->kNoError;
+}
+
+#endif
+
 
 // TODO(ajm): we currently just use the metrics from the first AEC. Think more
 //            aboue the best way to extend this to multi-channel.

@@ -16,6 +16,7 @@
 #include "talk/base/logging.h"
 #include "talk/base/stringutils.h"
 
+bool aec_on,agc_on,anc_on;
 ATOM MainWnd::wnd_class_ = 0;
 const wchar_t MainWnd::kClassName[] = L"WebRTC_MainWnd";
 
@@ -77,7 +78,7 @@ void DrawWhiteText(HDC dc, const RECT& rect, const char* text, int flags) {
 MainWnd::MainWnd()
   : ui_(CONNECT_TO_SERVER), wnd_(NULL), edit1_(NULL), edit2_(NULL),
     label1_(NULL), label2_(NULL), button_(NULL), listbox_(NULL),
-    destroyed_(false), callback_(NULL), nested_msg_(NULL) {
+    destroyed_(false), callback_(NULL), nested_msg_(NULL),aec_(NULL),anc_(NULL),agc_(NULL),label_agc(NULL),label_anc(NULL),label_aec(NULL) {
 }
 
 MainWnd::~MainWnd() {
@@ -314,6 +315,13 @@ void MainWnd::OnDestroyed() {
 void MainWnd::OnDefaultAction() {
   if (!callback_)
     return;
+  
+  std::string aec_string(GetWindowText(aec_));
+  std::string agc_string(GetWindowText(agc_));
+  std::string anc_string(GetWindowText(anc_));
+  aec_on=aec_string.length()? atoi(aec_string.c_str()) : 0;
+  agc_on=agc_string.length()? atoi(agc_string.c_str()) : 0;
+  anc_on=anc_string.length()? atoi(anc_string.c_str()) : 0;
   if (ui_ == CONNECT_TO_SERVER) {
     std::string server(GetWindowText(edit1_));
     std::string port_str(GetWindowText(edit2_));
@@ -465,6 +473,13 @@ void MainWnd::CreateChildWindows() {
   CreateChildWindow(&listbox_, LISTBOX_ID, L"ListBox",
                     LBS_HASSTRINGS | LBS_NOTIFY, WS_EX_CLIENTEDGE);
 
+  CreateChildWindow(&aec_, AEC_ID, L"Edit", ES_LEFT | ES_NOHIDESEL | WS_TABSTOP, WS_EX_CLIENTEDGE);
+  CreateChildWindow(&label_aec, LABEL1_ID, L"Static", ES_CENTER | ES_READONLY, 0);
+  CreateChildWindow(&agc_, AGC_ID, L"Edit", ES_LEFT | ES_NOHIDESEL | WS_TABSTOP, WS_EX_CLIENTEDGE);
+  CreateChildWindow(&label_agc, LABEL1_ID, L"Static", ES_CENTER | ES_READONLY, 0);
+  CreateChildWindow(&anc_, ANC_ID, L"Edit", ES_LEFT | ES_NOHIDESEL | WS_TABSTOP, WS_EX_CLIENTEDGE);
+  CreateChildWindow(&label_anc, LABEL1_ID, L"Static", ES_CENTER | ES_READONLY, 0);
+
   ::SetWindowTextA(edit1_, GetDefaultServerName().c_str());
   ::SetWindowTextA(edit2_, "8888");
 }
@@ -481,6 +496,12 @@ void MainWnd::LayoutConnectUI(bool show) {
     { label2_, L":" },
     { edit2_, L"XyXyX" },
     { button_, L"Connect" },
+	{ aec_, L"X" },
+	{ anc_, L"X" },
+	{ agc_, L"X" },
+	{ label_aec, L"aec"},
+	{ label_anc, L"anc"},
+	{ label_agc, L"agc"},
   };
 
   if (show) {
