@@ -1,0 +1,22 @@
+﻿Build started 12/19/2011 4:25:43 PM.
+     1>Project "C:\cygwin\home\nsinha\trunk\src\modules\video_render_module.vcxproj" on node 3 (build target(s)).
+     1>InitializeBuildStatus:
+         Creating "C:\cygwin\home\nsinha\trunk\peerconnection\Debug\obj\video_render_module\video_render_module.unsuccessfulbuild" because "AlwaysCreate" was specified.
+       ClCompile:
+         C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I.. /I..\.. /I..\..\third_party\wtl\include /Ivideo_render\main\source /Ivideo_render\main\interface /Iinterface /Iutility\interface /Iaudio_coding\main\interface /I..\system_wrappers\interface /I..\..\third_party\platformsdk_win7\files\Include /I..\..\third_party\directxsdk\files\Include /I"C:\Program Files\Microsoft Visual Studio 10.0\\VC\atlmfc\include" /Zi /nologo /W4 /WX- /Od /Oy- /D _DEBUG /D _WIN32_WINNT=0x0601 /D WINVER=0x0601 /D WIN32 /D _WINDOWS /D NOMINMAX /D PSAPI_VERSION=1 /D _CRT_RAND_S /D CERT_CHAIN_PARA_HAS_EXTRA_FIELDS /D WIN32_LEAN_AND_MEAN /D _ATL_NO_OPENGL /D _HAS_EXCEPTIONS=0 /D _SECURE_ATL /D CHROMIUM_BUILD /D TOOLKIT_VIEWS=1 /D ENABLE_REMOTING=1 /D ENABLE_P2P_APIS=1 /D ENABLE_CONFIGURATION_POLICY /D ENABLE_INPUT_SPEECH /D ENABLE_GPU=1 /D ENABLE_EGLIMAGE=1 /D USE_SKIA=1 /D __STD_C /D _CRT_SECURE_NO_DEPRECATE /D _SCL_SECURE_NO_DEPRECATE /D ENABLE_REGISTER_PROTOCOL_HANDLER=1 /D WEBRTC_TARGET_PC /D WEBRTC_INCLUDE_INTERNAL_VIDEO_RENDER /D __STDC_FORMAT_MACROS /D DYNAMIC_ANNOTATIONS_ENABLED=1 /D WTF_USE_DYNAMIC_ANNOTATIONS=1 /D _UNICODE /D UNICODE /Gm- /RTC1 /MTd /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /GR- /Fo"C:\cygwin\home\nsinha\trunk\peerconnection\Debug\obj\video_render_module\\" /Fd"C:\cygwin\home\nsinha\trunk\peerconnection\Debug\obj\video_render_module\vc100.pdb" /Gd /TP /wd4351 /wd4396 /wd4503 /wd4819 /wd4100 /wd4121 /wd4125 /wd4127 /wd4130 /wd4131 /wd4189 /wd4201 /wd4238 /wd4244 /wd4245 /wd4310 /wd4355 /wd4428 /wd4481 /wd4505 /wd4510 /wd4512 /wd4530 /wd4610 /wd4611 /wd4701 /wd4702 /wd4706 /wd4389 /analyze- /errorReport:prompt video_render\main\source\video_render_frames.cc video_render\main\source\incoming_video_stream.cc video_render\main\source\video_render_impl.cc video_render\main\source\windows\video_render_direct3d9.cc video_render\main\source\windows\video_render_directdraw.cc video_render\main\source\windows\video_render_windows_impl.cc video_render\main\source\external\video_render_external_impl.cc /MP /we4389 
+         video_render_frames.cc
+         incoming_video_stream.cc
+         video_render_impl.cc
+     1>c:\cygwin\home\nsinha\trunk\src\modules\video_render\main\source\windows/video_render_windows_impl.h(15): fatal error C1083: Cannot open include file: 'dxdiag.h': No such file or directory
+         video_render_direct3d9.cc
+         video_render_directdraw.cc
+     1>c:\cygwin\home\nsinha\trunk\src\modules\video_render\main\source\windows\video_render_direct3d9.h(18): fatal error C1083: Cannot open include file: 'd3dx9.h': No such file or directory
+         video_render_windows_impl.cc
+     1>c:\cygwin\home\nsinha\trunk\src\modules\video_render\main\source\windows\video_render_windows_impl.h(15): fatal error C1083: Cannot open include file: 'dxdiag.h': No such file or directory
+         video_render_external_impl.cc
+     1>c:\cygwin\home\nsinha\trunk\src\modules\video_render\main\source\windows\video_render_windows_impl.h(15): fatal error C1083: Cannot open include file: 'dxdiag.h': No such file or directory
+     1>Done Building Project "C:\cygwin\home\nsinha\trunk\src\modules\video_render_module.vcxproj" (build target(s)) -- FAILED.
+
+Build FAILED.
+
+Time Elapsed 00:00:01.70

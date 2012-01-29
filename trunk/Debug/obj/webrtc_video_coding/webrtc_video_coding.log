@@ -1,0 +1,69 @@
+﻿Build started 1/12/2012 9:03:01 PM.
+     1>Project "C:\cygwin\home\nsinha\original_ trunk\src\modules\webrtc_video_coding.vcxproj" on node 3 (rebuild target(s)).
+     1>InitializeBuildStatus:
+         Creating "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\webrtc_video_coding\webrtc_video_coding.unsuccessfulbuild" because "AlwaysCreate" was specified.
+       ClCompile:
+         C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I.. /I..\.. /I..\..\third_party\wtl\include /Ivideo_coding\main\interface /Iinterface /Ivideo_coding\codecs\interface /I..\common_video\interface /Ivideo_coding\codecs\i420\main\interface /Ivideo_coding\codecs\vp8\main\interface /I..\..\src\common_video\interface /I..\..\src\modules\video_coding\codecs\interface /I..\system_wrappers\interface /I..\..\third_party\platformsdk_win7\files\Include /I..\..\third_party\directxsdk\files\Include /I"C:\Program Files\Microsoft Visual Studio 10.0\\VC\atlmfc\include" /Zi /nologo /W4 /WX- /Od /Oy- /D _DEBUG /D _WIN32_WINNT=0x0601 /D WINVER=0x0601 /D WIN32 /D _WINDOWS /D NOMINMAX /D PSAPI_VERSION=1 /D _CRT_RAND_S /D CERT_CHAIN_PARA_HAS_EXTRA_FIELDS /D WIN32_LEAN_AND_MEAN /D _ATL_NO_OPENGL /D _HAS_EXCEPTIONS=0 /D _SECURE_ATL /D CHROMIUM_BUILD /D TOOLKIT_VIEWS=1 /D ENABLE_REMOTING=1 /D ENABLE_P2P_APIS=1 /D ENABLE_CONFIGURATION_POLICY /D ENABLE_INPUT_SPEECH /D ENABLE_GPU=1 /D ENABLE_EGLIMAGE=1 /D USE_SKIA=1 /D __STD_C /D _CRT_SECURE_NO_DEPRECATE /D _SCL_SECURE_NO_DEPRECATE /D ENABLE_REGISTER_PROTOCOL_HANDLER=1 /D WEBRTC_TARGET_PC /D __STDC_FORMAT_MACROS /D DYNAMIC_ANNOTATIONS_ENABLED=1 /D WTF_USE_DYNAMIC_ANNOTATIONS=1 /D _UNICODE /D UNICODE /Gm- /RTC1 /MTd /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /GR- /Fo"C:\cygwin\home\nsinha\original_ trunk\Debug\obj\webrtc_video_coding\\" /Fd"C:\cygwin\home\nsinha\original_ trunk\Debug\obj\webrtc_video_coding\vc100.pdb" /Gd /TP /wd4351 /wd4396 /wd4503 /wd4819 /wd4100 /wd4121 /wd4125 /wd4127 /wd4130 /wd4131 /wd4189 /wd4201 /wd4238 /wd4244 /wd4245 /wd4310 /wd4355 /wd4428 /wd4481 /wd4505 /wd4510 /wd4512 /wd4530 /wd4610 /wd4611 /wd4701 /wd4702 /wd4706 /wd4389 /analyze- /errorReport:prompt video_coding\main\source\generic_decoder.cc video_coding\main\source\frame_dropper.cc video_coding\main\source\jitter_buffer.cc video_coding\main\source\inter_frame_delay.cc video_coding\main\source\decoding_state.cc video_coding\main\source\jitter_estimator.cc video_coding\main\source\timestamp_extrapolator.cc video_coding\main\source\jitter_buffer_common.cc video_coding\main\source\media_opt_util.cc video_coding\main\source\encoded_frame.cc video_coding\main\source\video_coding_impl.cc video_coding\main\source\packet.cc video_coding\main\source\timestamp_map.cc video_coding\main\source\frame_buffer.cc video_coding\main\source\content_metrics_processing.cc video_coding\main\source\exp_filter.cc video_coding\main\source\receiver.cc video_coding\main\source\codec_database.cc video_coding\main\source\timing.cc video_coding\main\source\qm_select.cc video_coding\main\source\rtt_filter.cc video_coding\main\source\session_info.cc video_coding\main\source\generic_encoder.cc video_coding\main\source\frame_list.cc video_coding\main\source\media_optimization.cc video_coding\main\source\codec_timer.cc /MP /we4389 
+         generic_decoder.cc
+         frame_dropper.cc
+         jitter_buffer.cc
+         inter_frame_delay.cc
+         decoding_state.cc
+         jitter_estimator.cc
+         timestamp_extrapolator.cc
+         jitter_buffer_common.cc
+         media_opt_util.cc
+         encoded_frame.cc
+         video_coding_impl.cc
+         packet.cc
+         timestamp_map.cc
+         frame_buffer.cc
+         content_metrics_processing.cc
+         exp_filter.cc
+         receiver.cc
+         codec_database.cc
+         timing.cc
+         qm_select.cc
+         rtt_filter.cc
+         session_info.cc
+         generic_encoder.cc
+         frame_list.cc
+         media_optimization.cc
+         codec_timer.cc
+     1>C:\Program Files\MSBuild\Microsoft.Cpp\v4.0\Microsoft.CppBuild.targets(1151,5): warning MSB8012: TargetPath(C:\cygwin\home\nsinha\original_ trunk\src\modules\../..\build\Debug\webrtc_video_coding.lib) does not match the Library's OutputFile property value (C:\cygwin\home\nsinha\original_ trunk\build\Debug\lib\webrtc_video_coding.lib). This may cause your project to build incorrectly. To correct this, please make sure that $(OutDir), $(TargetName) and $(TargetExt) property values match the value specified in %(Lib.OutputFile).
+       Lib:
+         C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\Lib.exe /OUT:"../..\build\Debug\lib\webrtc_video_coding.lib" /LIBPATH:../../third_party/platformsdk_win7/files/Lib /LIBPATH:../../third_party/directxsdk/files/Lib/x86 /NOLOGO "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\webrtc_video_coding\generic_decoder.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\webrtc_video_coding\frame_dropper.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\webrtc_video_coding\jitter_buffer.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\webrtc_video_coding\inter_frame_delay.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\webrtc_video_coding\decoding_state.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\webrtc_video_coding\jitter_estimator.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\webrtc_video_coding\timestamp_extrapolator.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\webrtc_video_coding\jitter_buffer_common.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\webrtc_video_coding\media_opt_util.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\webrtc_video_coding\encoded_frame.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\webrtc_video_coding\video_coding_impl.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\webrtc_video_coding\packet.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\webrtc_video_coding\timestamp_map.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\webrtc_video_coding\frame_buffer.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\webrtc_video_coding\content_metrics_processing.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\webrtc_video_coding\exp_filter.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\webrtc_video_coding\receiver.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\webrtc_video_coding\codec_database.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\webrtc_video_coding\timing.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\webrtc_video_coding\qm_select.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\webrtc_video_coding\rtt_filter.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\webrtc_video_coding\session_info.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\webrtc_video_coding\generic_encoder.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\webrtc_video_coding\frame_list.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\webrtc_video_coding\media_optimization.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\webrtc_video_coding\codec_timer.obj" /ignore:4221 
+         webrtc_video_coding.vcxproj -> C:\cygwin\home\nsinha\original_ trunk\src\modules\../..\build\Debug\webrtc_video_coding.lib
+       FinalizeBuildStatus:
+         Deleting file "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\webrtc_video_coding\webrtc_video_coding.unsuccessfulbuild".
+         Touching "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\webrtc_video_coding\webrtc_video_coding.lastbuildstate".
+     1>Done Building Project "C:\cygwin\home\nsinha\original_ trunk\src\modules\webrtc_video_coding.vcxproj" (rebuild target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:04.84

@@ -1,0 +1,82 @@
+﻿Build started 12/19/2011 4:33:06 PM.
+     1>Project "C:\cygwin\home\nsinha\trunk\src\common_audio\signal_processing.vcxproj" on node 3 (build target(s)).
+     1>InitializeBuildStatus:
+         Creating "C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\signal_processing\signal_processing.unsuccessfulbuild" because "AlwaysCreate" was specified.
+       ClCompile:
+         C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I.. /I..\.. /I..\..\third_party\wtl\include /Isignal_processing\include /I..\..\third_party\platformsdk_win7\files\Include /I..\..\third_party\directxsdk\files\Include /I"C:\Program Files\Microsoft Visual Studio 10.0\\VC\atlmfc\include" /Zi /nologo /W4 /WX- /Od /Oy- /D _DEBUG /D _WIN32_WINNT=0x0601 /D WINVER=0x0601 /D WIN32 /D _WINDOWS /D NOMINMAX /D PSAPI_VERSION=1 /D _CRT_RAND_S /D CERT_CHAIN_PARA_HAS_EXTRA_FIELDS /D WIN32_LEAN_AND_MEAN /D _ATL_NO_OPENGL /D _HAS_EXCEPTIONS=0 /D _SECURE_ATL /D CHROMIUM_BUILD /D TOOLKIT_VIEWS=1 /D ENABLE_REMOTING=1 /D ENABLE_P2P_APIS=1 /D ENABLE_CONFIGURATION_POLICY /D ENABLE_INPUT_SPEECH /D ENABLE_GPU=1 /D ENABLE_EGLIMAGE=1 /D USE_SKIA=1 /D __STD_C /D _CRT_SECURE_NO_DEPRECATE /D _SCL_SECURE_NO_DEPRECATE /D ENABLE_REGISTER_PROTOCOL_HANDLER=1 /D WEBRTC_TARGET_PC /D __STDC_FORMAT_MACROS /D DYNAMIC_ANNOTATIONS_ENABLED=1 /D WTF_USE_DYNAMIC_ANNOTATIONS=1 /D _UNICODE /D UNICODE /Gm- /RTC1 /MTd /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /GR- /Fo"C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\signal_processing\\" /Fd"C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\signal_processing\vc100.pdb" /Gd /TC /wd4351 /wd4396 /wd4503 /wd4819 /wd4100 /wd4121 /wd4125 /wd4127 /wd4130 /wd4131 /wd4189 /wd4201 /wd4238 /wd4244 /wd4245 /wd4310 /wd4355 /wd4428 /wd4481 /wd4505 /wd4510 /wd4512 /wd4530 /wd4610 /wd4611 /wd4701 /wd4702 /wd4706 /wd4389 /analyze- /errorReport:prompt signal_processing\levinson_durbin.c signal_processing\filter_ar_fast_q12.c signal_processing\cross_correlation.c signal_processing\auto_correlation.c signal_processing\resample_by_2.c signal_processing\downsample_fast.c signal_processing\filter_ma_fast_q12.c signal_processing\resample_fractional.c signal_processing\spl_sqrt.c signal_processing\ilbc_specific_functions.c signal_processing\division_operations.c signal_processing\min_max_operations.c signal_processing\complex_bit_reverse.c signal_processing\copy_set_operations.c signal_processing\dot_product_with_scale.c signal_processing\get_scaling_square.c signal_processing\filter_ar.c signal_processing\sqrt_of_one_minus_x_squared.c signal_processing\energy.c signal_processing\lpc_to_refl_coef.c signal_processing\resample_by_2_internal.c signal_processing\spl_version.c signal_processing\complex_fft.c signal_processing\spl_sqrt_floor.c signal_processing\auto_corr_to_refl_coef.c signal_processing\resample_48khz.c signal_processing\randomization_functions.c signal_processing\splitting_filter.c signal_processing\get_hanning_window.c signal_processing\resample.c signal_processing\vector_scaling_operations.c signal_processing\refl_coef_to_lpc.c /MP /we4389 
+         levinson_durbin.c
+         filter_ar_fast_q12.c
+         cross_correlation.c
+         NOTE: default implementation is used
+         auto_correlation.c
+         resample_by_2.c
+         downsample_fast.c
+         filter_ma_fast_q12.c
+         resample_fractional.c
+         spl_sqrt.c
+         ilbc_specific_functions.c
+         division_operations.c
+         min_max_operations.c
+         complex_bit_reverse.c
+         copy_set_operations.c
+         dot_product_with_scale.c
+         get_scaling_square.c
+         filter_ar.c
+         sqrt_of_one_minus_x_squared.c
+         energy.c
+         lpc_to_refl_coef.c
+         resample_by_2_internal.c
+         spl_version.c
+         complex_fft.c
+         spl_sqrt_floor.c
+         auto_corr_to_refl_coef.c
+         resample_48khz.c
+         randomization_functions.c
+         splitting_filter.c
+         get_hanning_window.c
+         resample.c
+         vector_scaling_operations.c
+         refl_coef_to_lpc.c
+     1>C:\Program Files\MSBuild\Microsoft.Cpp\v4.0\Microsoft.CppBuild.targets(1151,5): warning MSB8012: TargetPath(C:\cygwin\home\nsinha\trunk\src\common_audio\../..\build\Debug\signal_processing.lib) does not match the Library's OutputFile property value (C:\cygwin\home\nsinha\trunk\build\Debug\lib\signal_processing.lib). This may cause your project to build incorrectly. To correct this, please make sure that $(OutDir), $(TargetName) and $(TargetExt) property values match the value specified in %(Lib.OutputFile).
+       Lib:
+         C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\Lib.exe /OUT:"../..\build\Debug\lib\signal_processing.lib" /LIBPATH:../../third_party/platformsdk_win7/files/Lib /LIBPATH:../../third_party/directxsdk/files/Lib/x86 /NOLOGO C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\signal_processing\levinson_durbin.obj
+         C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\signal_processing\filter_ar_fast_q12.obj
+         C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\signal_processing\cross_correlation.obj
+         C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\signal_processing\auto_correlation.obj
+         C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\signal_processing\resample_by_2.obj
+         C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\signal_processing\downsample_fast.obj
+         C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\signal_processing\filter_ma_fast_q12.obj
+         C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\signal_processing\resample_fractional.obj
+         C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\signal_processing\spl_sqrt.obj
+         C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\signal_processing\ilbc_specific_functions.obj
+         C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\signal_processing\division_operations.obj
+         C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\signal_processing\min_max_operations.obj
+         C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\signal_processing\complex_bit_reverse.obj
+         C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\signal_processing\copy_set_operations.obj
+         C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\signal_processing\dot_product_with_scale.obj
+         C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\signal_processing\get_scaling_square.obj
+         C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\signal_processing\filter_ar.obj
+         C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\signal_processing\sqrt_of_one_minus_x_squared.obj
+         C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\signal_processing\energy.obj
+         C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\signal_processing\lpc_to_refl_coef.obj
+         C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\signal_processing\resample_by_2_internal.obj
+         C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\signal_processing\spl_version.obj
+         C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\signal_processing\complex_fft.obj
+         C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\signal_processing\spl_sqrt_floor.obj
+         C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\signal_processing\auto_corr_to_refl_coef.obj
+         C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\signal_processing\resample_48khz.obj
+         C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\signal_processing\randomization_functions.obj
+         C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\signal_processing\splitting_filter.obj
+         C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\signal_processing\get_hanning_window.obj
+         C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\signal_processing\resample.obj
+         C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\signal_processing\vector_scaling_operations.obj
+         C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\signal_processing\refl_coef_to_lpc.obj /ignore:4221 
+         signal_processing.vcxproj -> C:\cygwin\home\nsinha\trunk\src\common_audio\../..\build\Debug\signal_processing.lib
+       FinalizeBuildStatus:
+         Deleting file "C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\signal_processing\signal_processing.unsuccessfulbuild".
+         Touching "C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\signal_processing\signal_processing.lastbuildstate".
+     1>Done Building Project "C:\cygwin\home\nsinha\trunk\src\common_audio\signal_processing.vcxproj" (build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:02.29

@@ -1,0 +1,24 @@
+﻿Build started 12/19/2011 4:34:57 PM.
+     1>Project "C:\cygwin\home\nsinha\trunk\third_party\yasm\genperf_libs.vcxproj" on node 3 (build target(s)).
+     1>C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\Microsoft.Common.Targets(1200,9): warning : The referenced project 'trunk\third_party\yasm\config_sources.vcxproj' does not exist.
+     1>InitializeBuildStatus:
+         Creating "C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\genperf_libs\genperf_libs.unsuccessfulbuild" because "AlwaysCreate" was specified.
+       ClCompile:
+         C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I..\..\third_party\wtl\include /Isource\config\win /I"source\patched-yasm" /I..\..\third_party\platformsdk_win7\files\Include /I..\..\third_party\directxsdk\files\Include /I"C:\Program Files\Microsoft Visual Studio 10.0\\VC\atlmfc\include" /Zi /nologo /W3 /WX- /Od /Oy- /D _DEBUG /D _WIN32_WINNT=0x0601 /D WINVER=0x0601 /D WIN32 /D _WINDOWS /D NOMINMAX /D PSAPI_VERSION=1 /D _CRT_RAND_S /D CERT_CHAIN_PARA_HAS_EXTRA_FIELDS /D WIN32_LEAN_AND_MEAN /D _ATL_NO_OPENGL /D _HAS_EXCEPTIONS=0 /D _SECURE_ATL /D CHROMIUM_BUILD /D TOOLKIT_VIEWS=1 /D ENABLE_REMOTING=1 /D ENABLE_P2P_APIS=1 /D ENABLE_CONFIGURATION_POLICY /D ENABLE_INPUT_SPEECH /D ENABLE_GPU=1 /D ENABLE_EGLIMAGE=1 /D USE_SKIA=1 /D __STD_C /D _CRT_SECURE_NO_DEPRECATE /D _SCL_SECURE_NO_DEPRECATE /D ENABLE_REGISTER_PROTOCOL_HANDLER=1 /D HAVE_CONFIG_H /D _CRT_NONSTDC_NO_WARNINGS /D _CRT_NONSTDC_NO_DEPRECATE /D DYNAMIC_ANNOTATIONS_ENABLED=1 /D WTF_USE_DYNAMIC_ANNOTATIONS=1 /D _UNICODE /D UNICODE /Gm- /RTC1 /MTd /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /GR- /Fo"C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\genperf_libs\\" /Fd"C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\genperf_libs\vc100.pdb" /Gd /TC /wd4351 /wd4396 /wd4503 /wd4819 /wd4100 /wd4121 /wd4125 /wd4127 /wd4130 /wd4131 /wd4189 /wd4201 /wd4238 /wd4244 /wd4245 /wd4310 /wd4355 /wd4428 /wd4481 /wd4505 /wd4510 /wd4512 /wd4530 /wd4610 /wd4611 /wd4701 /wd4702 /wd4706 /wd4800 /analyze- /errorReport:prompt "source\patched-yasm\libyasm\xmalloc.c" "source\patched-yasm\libyasm\xstrdup.c" "source\patched-yasm\libyasm\phash.c" /MP 
+         xmalloc.c
+         xstrdup.c
+         phash.c
+     1>C:\Program Files\MSBuild\Microsoft.Cpp\v4.0\Microsoft.CppBuild.targets(1151,5): warning MSB8012: TargetPath(C:\cygwin\home\nsinha\trunk\third_party\yasm\../..\build\Debug\genperf_libs.lib) does not match the Library's OutputFile property value (C:\cygwin\home\nsinha\trunk\build\Debug\lib\genperf_libs.lib). This may cause your project to build incorrectly. To correct this, please make sure that $(OutDir), $(TargetName) and $(TargetExt) property values match the value specified in %(Lib.OutputFile).
+       Lib:
+         C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\Lib.exe /OUT:"../..\build\Debug\lib\genperf_libs.lib" /LIBPATH:../../third_party/platformsdk_win7/files/Lib /LIBPATH:../../third_party/directxsdk/files/Lib/x86 /NOLOGO C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\genperf_libs\xmalloc.obj
+         C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\genperf_libs\xstrdup.obj
+         C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\genperf_libs\phash.obj /ignore:4221 
+         genperf_libs.vcxproj -> C:\cygwin\home\nsinha\trunk\third_party\yasm\../..\build\Debug\genperf_libs.lib
+       FinalizeBuildStatus:
+         Deleting file "C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\genperf_libs\genperf_libs.unsuccessfulbuild".
+         Touching "C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\genperf_libs\genperf_libs.lastbuildstate".
+     1>Done Building Project "C:\cygwin\home\nsinha\trunk\third_party\yasm\genperf_libs.vcxproj" (build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:00.57

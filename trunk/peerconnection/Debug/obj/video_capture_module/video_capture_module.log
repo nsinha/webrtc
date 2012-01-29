@@ -1,0 +1,85 @@
+﻿Build started 12/19/2011 4:26:14 PM.
+     1>Project "C:\cygwin\home\nsinha\trunk\src\modules\video_capture_module.vcxproj" on node 2 (build target(s)).
+     1>InitializeBuildStatus:
+         Creating "C:\cygwin\home\nsinha\trunk\peerconnection\Debug\obj\video_capture_module\video_capture_module.unsuccessfulbuild" because "AlwaysCreate" was specified.
+       ClCompile:
+         C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I.. /I..\.. /I..\..\third_party\wtl\include /Ivideo_capture\main\interface /Iinterface /I..\..\src\common_video\libyuv\include /Ivideo_capture\main\source\Windows /I"C:\Program Files\Microsoft SDKs\Windows\v7.1\Samples\multimedia\directshow\baseclasses" /Iutility\interface /Iaudio_coding\main\interface /I..\system_wrappers\interface /I..\..\third_party\platformsdk_win7\files\Include /I..\..\third_party\directxsdk\files\Include /I"C:\Program Files\Microsoft Visual Studio 10.0\\VC\atlmfc\include" /Zi /nologo /W4 /WX- /Od /Oy- /D _DEBUG /D _WIN32_WINNT=0x0601 /D WINVER=0x0601 /D WIN32 /D _WINDOWS /D PSAPI_VERSION=1 /D _CRT_RAND_S /D CERT_CHAIN_PARA_HAS_EXTRA_FIELDS /D WIN32_LEAN_AND_MEAN /D _ATL_NO_OPENGL /D _HAS_EXCEPTIONS=0 /D _SECURE_ATL /D CHROMIUM_BUILD /D TOOLKIT_VIEWS=1 /D ENABLE_REMOTING=1 /D ENABLE_P2P_APIS=1 /D ENABLE_CONFIGURATION_POLICY /D ENABLE_INPUT_SPEECH /D ENABLE_GPU=1 /D ENABLE_EGLIMAGE=1 /D USE_SKIA=1 /D __STD_C /D _CRT_SECURE_NO_DEPRECATE /D _SCL_SECURE_NO_DEPRECATE /D ENABLE_REGISTER_PROTOCOL_HANDLER=1 /D WEBRTC_TARGET_PC /D __STDC_FORMAT_MACROS /D DYNAMIC_ANNOTATIONS_ENABLED=1 /D WTF_USE_DYNAMIC_ANNOTATIONS=1 /D _UNICODE /D UNICODE /Gm- /RTC1 /MTd /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /GR- /Fo"C:\cygwin\home\nsinha\trunk\peerconnection\Debug\obj\video_capture_module\\" /Fd"C:\cygwin\home\nsinha\trunk\peerconnection\Debug\obj\video_capture_module\vc100.pdb" /Gd /TP /wd4351 /wd4396 /wd4503 /wd4819 /wd4100 /wd4121 /wd4125 /wd4127 /wd4130 /wd4131 /wd4189 /wd4201 /wd4238 /wd4244 /wd4245 /wd4310 /wd4355 /wd4428 /wd4481 /wd4505 /wd4510 /wd4512 /wd4530 /wd4610 /wd4611 /wd4701 /wd4702 /wd4706 /wd4389 /analyze- /errorReport:prompt "C:\Program Files\Microsoft SDKs\Windows\v7.1\Samples\multimedia\directshow\baseclasses\wxlist.cpp" "C:\Program Files\Microsoft SDKs\Windows\v7.1\Samples\multimedia\directshow\baseclasses\outputq.cpp" "C:\Program Files\Microsoft SDKs\Windows\v7.1\Samples\multimedia\directshow\baseclasses\amextra.cpp" "C:\Program Files\Microsoft SDKs\Windows\v7.1\Samples\multimedia\directshow\baseclasses\winctrl.cpp" "C:\Program Files\Microsoft SDKs\Windows\v7.1\Samples\multimedia\directshow\baseclasses\pstream.cpp" "C:\Program Files\Microsoft SDKs\Windows\v7.1\Samples\multimedia\directshow\baseclasses\arithutil.cpp" "C:\Program Files\Microsoft SDKs\Windows\v7.1\Samples\multimedia\directshow\baseclasses\transfrm.cpp" "C:\Program Files\Microsoft SDKs\Windows\v7.1\Samples\multimedia\directshow\baseclasses\amvideo.cpp" "C:\Program Files\Microsoft SDKs\Windows\v7.1\Samples\multimedia\directshow\baseclasses\mtype.cpp" "C:\Program Files\Microsoft SDKs\Windows\v7.1\Samples\multimedia\directshow\baseclasses\combase.cpp" "C:\Program Files\Microsoft SDKs\Windows\v7.1\Samples\multimedia\directshow\baseclasses\transip.cpp" "C:\Program Files\Microsoft SDKs\Windows\v7.1\Samples\multimedia\directshow\baseclasses\vtrans.cpp" "C:\Program Files\Microsoft SDKs\Windows\v7.1\Samples\multimedia\directshow\baseclasses\videoctl.cpp" "C:\Program Files\Microsoft SDKs\Windows\v7.1\Samples\multimedia\directshow\baseclasses\pullpin.cpp" "C:\Program Files\Microsoft SDKs\Windows\v7.1\Samples\multimedia\directshow\baseclasses\seekpt.cpp" "C:\Program Files\Microsoft SDKs\Windows\v7.1\Samples\multimedia\directshow\baseclasses\cprop.cpp" "C:\Program Files\Microsoft SDKs\Windows\v7.1\Samples\multimedia\directshow\baseclasses\dllsetup.cpp" "C:\Program Files\Microsoft SDKs\Windows\v7.1\Samples\multimedia\directshow\baseclasses\refclock.cpp" "C:\Program Files\Microsoft SDKs\Windows\v7.1\Samples\multimedia\directshow\baseclasses\perflog.cpp" "C:\Program Files\Microsoft SDKs\Windows\v7.1\Samples\multimedia\directshow\baseclasses\amfilter.cpp" "C:\Program Files\Microsoft SDKs\Windows\v7.1\Samples\multimedia\directshow\baseclasses\sysclock.cpp" "C:\Program Files\Microsoft SDKs\Windows\v7.1\Samples\multimedia\directshow\baseclasses\ctlutil.cpp" "C:\Program Files\Microsoft SDKs\Windows\v7.1\Samples\multimedia\directshow\baseclasses\dllentry.cpp" "C:\Program Files\Microsoft SDKs\Windows\v7.1\Samples\multimedia\directshow\baseclasses\ddmm.cpp" "C:\Program Files\Microsoft SDKs\Windows\v7.1\Samples\multimedia\directshow\baseclasses\winutil.cpp" "C:\Program Files\Microsoft SDKs\Windows\v7.1\Samples\multimedia\directshow\baseclasses\renbase.cpp" "C:\Program Files\Microsoft SDKs\Windows\v7.1\Samples\multimedia\directshow\baseclasses\wxdebug.cpp" "C:\Program Files\Microsoft SDKs\Windows\v7.1\Samples\multimedia\directshow\baseclasses\source.cpp" "C:\Program Files\Microsoft SDKs\Windows\v7.1\Samples\multimedia\directshow\baseclasses\wxutil.cpp" "C:\Program Files\Microsoft SDKs\Windows\v7.1\Samples\multimedia\directshow\baseclasses\schedule.cpp" "C:\Program Files\Microsoft SDKs\Windows\v7.1\Samples\multimedia\directshow\baseclasses\strmctl.cpp" video_capture\main\source\video_capture_impl.cc video_capture\main\source\vplib_conversions.cc video_capture\main\source\video_capture_factory.cc video_capture\main\source\device_info_impl.cc video_capture\main\source\Windows\help_functions_windows.cc video_capture\main\source\Windows\video_capture_factory_windows.cc video_capture\main\source\Windows\device_info_windows.cc video_capture\main\source\Windows\sink_filter_windows.cc video_capture\main\source\Windows\video_capture_windows.cc /MP /we4389 
+         wxlist.cpp
+     1>c1xx : fatal error C1083: Cannot open source file: 'C:\Program Files\Microsoft SDKs\Windows\v7.1\Samples\multimedia\directshow\baseclasses\wxlist.cpp': No such file or directory
+         outputq.cpp
+         amextra.cpp
+     1>c1xx : fatal error C1083: Cannot open source file: 'C:\Program Files\Microsoft SDKs\Windows\v7.1\Samples\multimedia\directshow\baseclasses\amextra.cpp': No such file or directory
+         winctrl.cpp
+     1>c1xx : fatal error C1083: Cannot open source file: 'C:\Program Files\Microsoft SDKs\Windows\v7.1\Samples\multimedia\directshow\baseclasses\winctrl.cpp': No such file or directory
+         pstream.cpp
+     1>c1xx : fatal error C1083: Cannot open source file: 'C:\Program Files\Microsoft SDKs\Windows\v7.1\Samples\multimedia\directshow\baseclasses\outputq.cpp': No such file or directory
+     1>c1xx : fatal error C1083: Cannot open source file: 'C:\Program Files\Microsoft SDKs\Windows\v7.1\Samples\multimedia\directshow\baseclasses\pstream.cpp': No such file or directory
+         arithutil.cpp
+     1>c1xx : fatal error C1083: Cannot open source file: 'C:\Program Files\Microsoft SDKs\Windows\v7.1\Samples\multimedia\directshow\baseclasses\arithutil.cpp': No such file or directory
+         transfrm.cpp
+     1>c1xx : fatal error C1083: Cannot open source file: 'C:\Program Files\Microsoft SDKs\Windows\v7.1\Samples\multimedia\directshow\baseclasses\transfrm.cpp': No such file or directory
+         amvideo.cpp
+         mtype.cpp
+     1>c1xx : fatal error C1083: Cannot open source file: 'C:\Program Files\Microsoft SDKs\Windows\v7.1\Samples\multimedia\directshow\baseclasses\mtype.cpp': No such file or directory
+         combase.cpp
+     1>c1xx : fatal error C1083: Cannot open source file: 'C:\Program Files\Microsoft SDKs\Windows\v7.1\Samples\multimedia\directshow\baseclasses\combase.cpp': No such file or directory
+         transip.cpp
+     1>c1xx : fatal error C1083: Cannot open source file: 'C:\Program Files\Microsoft SDKs\Windows\v7.1\Samples\multimedia\directshow\baseclasses\transip.cpp': No such file or directory
+         vtrans.cpp
+     1>c1xx : fatal error C1083: Cannot open source file: 'C:\Program Files\Microsoft SDKs\Windows\v7.1\Samples\multimedia\directshow\baseclasses\amvideo.cpp': No such file or directory
+     1>c1xx : fatal error C1083: Cannot open source file: 'C:\Program Files\Microsoft SDKs\Windows\v7.1\Samples\multimedia\directshow\baseclasses\vtrans.cpp': No such file or directory
+         videoctl.cpp
+     1>c1xx : fatal error C1083: Cannot open source file: 'C:\Program Files\Microsoft SDKs\Windows\v7.1\Samples\multimedia\directshow\baseclasses\videoctl.cpp': No such file or directory
+         pullpin.cpp
+         seekpt.cpp
+     1>c1xx : fatal error C1083: Cannot open source file: 'C:\Program Files\Microsoft SDKs\Windows\v7.1\Samples\multimedia\directshow\baseclasses\seekpt.cpp': No such file or directory
+         cprop.cpp
+     1>c1xx : fatal error C1083: Cannot open source file: 'C:\Program Files\Microsoft SDKs\Windows\v7.1\Samples\multimedia\directshow\baseclasses\cprop.cpp': No such file or directory
+         dllsetup.cpp
+     1>c1xx : fatal error C1083: Cannot open source file: 'C:\Program Files\Microsoft SDKs\Windows\v7.1\Samples\multimedia\directshow\baseclasses\dllsetup.cpp': No such file or directory
+         refclock.cpp
+     1>c1xx : fatal error C1083: Cannot open source file: 'C:\Program Files\Microsoft SDKs\Windows\v7.1\Samples\multimedia\directshow\baseclasses\refclock.cpp': No such file or directory
+     1>c1xx : fatal error C1083: Cannot open source file: 'C:\Program Files\Microsoft SDKs\Windows\v7.1\Samples\multimedia\directshow\baseclasses\pullpin.cpp': No such file or directory
+         perflog.cpp
+     1>c1xx : fatal error C1083: Cannot open source file: 'C:\Program Files\Microsoft SDKs\Windows\v7.1\Samples\multimedia\directshow\baseclasses\perflog.cpp': No such file or directory
+         amfilter.cpp
+         sysclock.cpp
+     1>c1xx : fatal error C1083: Cannot open source file: 'C:\Program Files\Microsoft SDKs\Windows\v7.1\Samples\multimedia\directshow\baseclasses\sysclock.cpp': No such file or directory
+         ctlutil.cpp
+     1>c1xx : fatal error C1083: Cannot open source file: 'C:\Program Files\Microsoft SDKs\Windows\v7.1\Samples\multimedia\directshow\baseclasses\ctlutil.cpp': No such file or directory
+     1>c1xx : fatal error C1083: Cannot open source file: 'C:\Program Files\Microsoft SDKs\Windows\v7.1\Samples\multimedia\directshow\baseclasses\amfilter.cpp': No such file or directory
+         dllentry.cpp
+     1>c1xx : fatal error C1083: Cannot open source file: 'C:\Program Files\Microsoft SDKs\Windows\v7.1\Samples\multimedia\directshow\baseclasses\dllentry.cpp': No such file or directory
+         ddmm.cpp
+         winutil.cpp
+     1>c1xx : fatal error C1083: Cannot open source file: 'C:\Program Files\Microsoft SDKs\Windows\v7.1\Samples\multimedia\directshow\baseclasses\winutil.cpp': No such file or directory
+         renbase.cpp
+     1>c1xx : fatal error C1083: Cannot open source file: 'C:\Program Files\Microsoft SDKs\Windows\v7.1\Samples\multimedia\directshow\baseclasses\renbase.cpp': No such file or directory
+         wxdebug.cpp
+     1>c1xx : fatal error C1083: Cannot open source file: 'C:\Program Files\Microsoft SDKs\Windows\v7.1\Samples\multimedia\directshow\baseclasses\ddmm.cpp': No such file or directory
+     1>c1xx : fatal error C1083: Cannot open source file: 'C:\Program Files\Microsoft SDKs\Windows\v7.1\Samples\multimedia\directshow\baseclasses\wxdebug.cpp': No such file or directory
+         source.cpp
+         wxutil.cpp
+     1>c1xx : fatal error C1083: Cannot open source file: 'C:\Program Files\Microsoft SDKs\Windows\v7.1\Samples\multimedia\directshow\baseclasses\wxutil.cpp': No such file or directory
+         schedule.cpp
+     1>c1xx : fatal error C1083: Cannot open source file: 'C:\Program Files\Microsoft SDKs\Windows\v7.1\Samples\multimedia\directshow\baseclasses\schedule.cpp': No such file or directory
+         strmctl.cpp
+     1>c1xx : fatal error C1083: Cannot open source file: 'C:\Program Files\Microsoft SDKs\Windows\v7.1\Samples\multimedia\directshow\baseclasses\strmctl.cpp': No such file or directory
+         video_capture_impl.cc
+     1>c1xx : fatal error C1083: Cannot open source file: 'C:\Program Files\Microsoft SDKs\Windows\v7.1\Samples\multimedia\directshow\baseclasses\source.cpp': No such file or directory
+         vplib_conversions.cc
+         video_capture_factory.cc
+         device_info_impl.cc
+         help_functions_windows.cc
+         video_capture_factory_windows.cc
+         device_info_windows.cc
+     1>video_capture\main\source\Windows\device_info_windows.cc(19): fatal error C1083: Cannot open include file: 'Streams.h': No such file or directory
+         sink_filter_windows.cc
+     1>c:\cygwin\home\nsinha\trunk\src\modules\video_capture\main\source\windows\sink_filter_windows.h(14): fatal error C1083: Cannot open include file: 'Streams.h': No such file or directory
+         video_capture_windows.cc
+     1>c:\cygwin\home\nsinha\trunk\src\modules\video_capture\main\source\windows\sink_filter_windows.h(14): fatal error C1083: Cannot open include file: 'Streams.h': No such file or directory
+     1>Done Building Project "C:\cygwin\home\nsinha\trunk\src\modules\video_capture_module.vcxproj" (build target(s)) -- FAILED.
+
+Build FAILED.
+
+Time Elapsed 00:00:04.46

@@ -1,0 +1,65 @@
+﻿Build started 12/19/2011 4:26:28 PM.
+     1>Project "C:\cygwin\home\nsinha\trunk\src\modules\iSACFix.vcxproj" on node 2 (build target(s)).
+     1>InitializeBuildStatus:
+         Creating "C:\cygwin\home\nsinha\trunk\peerconnection\Debug\obj\iSACFix\iSACFix.unsuccessfulbuild" because "AlwaysCreate" was specified.
+       ClCompile:
+         C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I.. /I..\.. /I..\..\third_party\wtl\include /Iaudio_coding\codecs\iSAC\fix\interface /I..\common_audio\signal_processing\include /I..\..\third_party\platformsdk_win7\files\Include /I..\..\third_party\directxsdk\files\Include /I"C:\Program Files\Microsoft Visual Studio 10.0\\VC\atlmfc\include" /Zi /nologo /W4 /WX- /Od /Oy- /D _DEBUG /D _WIN32_WINNT=0x0601 /D WINVER=0x0601 /D WIN32 /D _WINDOWS /D NOMINMAX /D PSAPI_VERSION=1 /D _CRT_RAND_S /D CERT_CHAIN_PARA_HAS_EXTRA_FIELDS /D WIN32_LEAN_AND_MEAN /D _ATL_NO_OPENGL /D _HAS_EXCEPTIONS=0 /D _SECURE_ATL /D CHROMIUM_BUILD /D TOOLKIT_VIEWS=1 /D ENABLE_REMOTING=1 /D ENABLE_P2P_APIS=1 /D ENABLE_CONFIGURATION_POLICY /D ENABLE_INPUT_SPEECH /D ENABLE_GPU=1 /D ENABLE_EGLIMAGE=1 /D USE_SKIA=1 /D __STD_C /D _CRT_SECURE_NO_DEPRECATE /D _SCL_SECURE_NO_DEPRECATE /D ENABLE_REGISTER_PROTOCOL_HANDLER=1 /D WEBRTC_TARGET_PC /D __STDC_FORMAT_MACROS /D DYNAMIC_ANNOTATIONS_ENABLED=1 /D WTF_USE_DYNAMIC_ANNOTATIONS=1 /D _UNICODE /D UNICODE /Gm- /RTC1 /MTd /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /GR- /Fo"C:\cygwin\home\nsinha\trunk\peerconnection\Debug\obj\iSACFix\\" /Fd"C:\cygwin\home\nsinha\trunk\peerconnection\Debug\obj\iSACFix\vc100.pdb" /Gd /TC /wd4351 /wd4396 /wd4503 /wd4819 /wd4100 /wd4121 /wd4125 /wd4127 /wd4130 /wd4131 /wd4189 /wd4201 /wd4238 /wd4244 /wd4245 /wd4310 /wd4355 /wd4428 /wd4481 /wd4505 /wd4510 /wd4512 /wd4530 /wd4610 /wd4611 /wd4701 /wd4702 /wd4706 /wd4389 /analyze- /errorReport:prompt audio_coding\codecs\iSAC\fix\source\lpc_tables.c audio_coding\codecs\iSAC\fix\source\decode_bwe.c audio_coding\codecs\iSAC\fix\source\arith_routines_logist.c audio_coding\codecs\iSAC\fix\source\filters.c audio_coding\codecs\iSAC\fix\source\filterbank_tables.c audio_coding\codecs\iSAC\fix\source\initialize.c audio_coding\codecs\iSAC\fix\source\decode.c audio_coding\codecs\iSAC\fix\source\lpc_masking_model.c audio_coding\codecs\iSAC\fix\source\arith_routines.c audio_coding\codecs\iSAC\fix\source\pitch_estimator.c audio_coding\codecs\iSAC\fix\source\pitch_gain_tables.c audio_coding\codecs\iSAC\fix\source\entropy_coding.c audio_coding\codecs\iSAC\fix\source\transform.c audio_coding\codecs\iSAC\fix\source\decode_plc.c audio_coding\codecs\iSAC\fix\source\spectrum_ar_model_tables.c audio_coding\codecs\iSAC\fix\source\encode.c audio_coding\codecs\iSAC\fix\source\isacfix.c audio_coding\codecs\iSAC\fix\source\fft.c audio_coding\codecs\iSAC\fix\source\lattice.c audio_coding\codecs\iSAC\fix\source\arith_routines_hist.c audio_coding\codecs\iSAC\fix\source\pitch_lag_tables.c audio_coding\codecs\iSAC\fix\source\filterbanks.c audio_coding\codecs\iSAC\fix\source\bandwidth_estimator.c audio_coding\codecs\iSAC\fix\source\pitch_filter.c /MP /we4389 
+         lpc_tables.c
+         decode_bwe.c
+         arith_routines_logist.c
+         filters.c
+         filterbank_tables.c
+         initialize.c
+         decode.c
+         lpc_masking_model.c
+         arith_routines.c
+         pitch_estimator.c
+         pitch_gain_tables.c
+         entropy_coding.c
+         transform.c
+         decode_plc.c
+         spectrum_ar_model_tables.c
+         encode.c
+         isacfix.c
+         fft.c
+         lattice.c
+         arith_routines_hist.c
+         pitch_lag_tables.c
+         filterbanks.c
+         bandwidth_estimator.c
+         pitch_filter.c
+     1>C:\Program Files\MSBuild\Microsoft.Cpp\v4.0\Microsoft.CppBuild.targets(1151,5): warning MSB8012: TargetPath(C:\cygwin\home\nsinha\trunk\src\modules\../..\build\Debug\iSACFix.lib) does not match the Library's OutputFile property value (C:\cygwin\home\nsinha\trunk\build\Debug\lib\iSACFix.lib). This may cause your project to build incorrectly. To correct this, please make sure that $(OutDir), $(TargetName) and $(TargetExt) property values match the value specified in %(Lib.OutputFile).
+       Lib:
+         C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\Lib.exe /OUT:"../..\build\Debug\lib\iSACFix.lib" /LIBPATH:../../third_party/platformsdk_win7/files/Lib /LIBPATH:../../third_party/directxsdk/files/Lib/x86 /NOLOGO C:\cygwin\home\nsinha\trunk\peerconnection\Debug\obj\iSACFix\lpc_tables.obj
+         C:\cygwin\home\nsinha\trunk\peerconnection\Debug\obj\iSACFix\decode_bwe.obj
+         C:\cygwin\home\nsinha\trunk\peerconnection\Debug\obj\iSACFix\arith_routines_logist.obj
+         C:\cygwin\home\nsinha\trunk\peerconnection\Debug\obj\iSACFix\filters.obj
+         C:\cygwin\home\nsinha\trunk\peerconnection\Debug\obj\iSACFix\filterbank_tables.obj
+         C:\cygwin\home\nsinha\trunk\peerconnection\Debug\obj\iSACFix\initialize.obj
+         C:\cygwin\home\nsinha\trunk\peerconnection\Debug\obj\iSACFix\decode.obj
+         C:\cygwin\home\nsinha\trunk\peerconnection\Debug\obj\iSACFix\lpc_masking_model.obj
+         C:\cygwin\home\nsinha\trunk\peerconnection\Debug\obj\iSACFix\arith_routines.obj
+         C:\cygwin\home\nsinha\trunk\peerconnection\Debug\obj\iSACFix\pitch_estimator.obj
+         C:\cygwin\home\nsinha\trunk\peerconnection\Debug\obj\iSACFix\pitch_gain_tables.obj
+         C:\cygwin\home\nsinha\trunk\peerconnection\Debug\obj\iSACFix\entropy_coding.obj
+         C:\cygwin\home\nsinha\trunk\peerconnection\Debug\obj\iSACFix\transform.obj
+         C:\cygwin\home\nsinha\trunk\peerconnection\Debug\obj\iSACFix\decode_plc.obj
+         C:\cygwin\home\nsinha\trunk\peerconnection\Debug\obj\iSACFix\spectrum_ar_model_tables.obj
+         C:\cygwin\home\nsinha\trunk\peerconnection\Debug\obj\iSACFix\encode.obj
+         C:\cygwin\home\nsinha\trunk\peerconnection\Debug\obj\iSACFix\isacfix.obj
+         C:\cygwin\home\nsinha\trunk\peerconnection\Debug\obj\iSACFix\fft.obj
+         C:\cygwin\home\nsinha\trunk\peerconnection\Debug\obj\iSACFix\lattice.obj
+         C:\cygwin\home\nsinha\trunk\peerconnection\Debug\obj\iSACFix\arith_routines_hist.obj
+         C:\cygwin\home\nsinha\trunk\peerconnection\Debug\obj\iSACFix\pitch_lag_tables.obj
+         C:\cygwin\home\nsinha\trunk\peerconnection\Debug\obj\iSACFix\filterbanks.obj
+         C:\cygwin\home\nsinha\trunk\peerconnection\Debug\obj\iSACFix\bandwidth_estimator.obj
+         C:\cygwin\home\nsinha\trunk\peerconnection\Debug\obj\iSACFix\pitch_filter.obj /ignore:4221 
+         iSACFix.vcxproj -> C:\cygwin\home\nsinha\trunk\src\modules\../..\build\Debug\iSACFix.lib
+       FinalizeBuildStatus:
+         Deleting file "C:\cygwin\home\nsinha\trunk\peerconnection\Debug\obj\iSACFix\iSACFix.unsuccessfulbuild".
+         Touching "C:\cygwin\home\nsinha\trunk\peerconnection\Debug\obj\iSACFix\iSACFix.lastbuildstate".
+     1>Done Building Project "C:\cygwin\home\nsinha\trunk\src\modules\iSACFix.vcxproj" (build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:01.17

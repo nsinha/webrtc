@@ -1,0 +1,67 @@
+﻿Build started 1/12/2012 9:01:54 PM.
+     1>Project "C:\cygwin\home\nsinha\original_ trunk\src\modules\rtp_rtcp.vcxproj" on node 3 (rebuild target(s)).
+     1>InitializeBuildStatus:
+         Creating "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\rtp_rtcp\rtp_rtcp.unsuccessfulbuild" because "AlwaysCreate" was specified.
+       ClCompile:
+         C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I.. /I..\.. /I..\..\third_party\wtl\include /Irtp_rtcp\interface /Iinterface /I..\system_wrappers\interface /I..\..\third_party\platformsdk_win7\files\Include /I..\..\third_party\directxsdk\files\Include /I"C:\Program Files\Microsoft Visual Studio 10.0\\VC\atlmfc\include" /Zi /nologo /W4 /WX- /Od /Oy- /D _DEBUG /D _WIN32_WINNT=0x0601 /D WINVER=0x0601 /D WIN32 /D _WINDOWS /D NOMINMAX /D PSAPI_VERSION=1 /D _CRT_RAND_S /D CERT_CHAIN_PARA_HAS_EXTRA_FIELDS /D WIN32_LEAN_AND_MEAN /D _ATL_NO_OPENGL /D _HAS_EXCEPTIONS=0 /D _SECURE_ATL /D CHROMIUM_BUILD /D TOOLKIT_VIEWS=1 /D ENABLE_REMOTING=1 /D ENABLE_P2P_APIS=1 /D ENABLE_CONFIGURATION_POLICY /D ENABLE_INPUT_SPEECH /D ENABLE_GPU=1 /D ENABLE_EGLIMAGE=1 /D USE_SKIA=1 /D __STD_C /D _CRT_SECURE_NO_DEPRECATE /D _SCL_SECURE_NO_DEPRECATE /D ENABLE_REGISTER_PROTOCOL_HANDLER=1 /D WEBRTC_TARGET_PC /D __STDC_FORMAT_MACROS /D DYNAMIC_ANNOTATIONS_ENABLED=1 /D WTF_USE_DYNAMIC_ANNOTATIONS=1 /D _UNICODE /D UNICODE /Gm- /RTC1 /MTd /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /GR- /Fo"C:\cygwin\home\nsinha\original_ trunk\Debug\obj\rtp_rtcp\\" /Fd"C:\cygwin\home\nsinha\original_ trunk\Debug\obj\rtp_rtcp\vc100.pdb" /Gd /TP /wd4351 /wd4396 /wd4503 /wd4819 /wd4100 /wd4121 /wd4125 /wd4127 /wd4130 /wd4131 /wd4189 /wd4201 /wd4238 /wd4244 /wd4245 /wd4310 /wd4355 /wd4428 /wd4481 /wd4505 /wd4510 /wd4512 /wd4530 /wd4610 /wd4611 /wd4701 /wd4702 /wd4706 /wd4389 /analyze- /errorReport:prompt rtp_rtcp\source\h263_information.cc rtp_rtcp\source\rtp_header_extension.cc rtp_rtcp\source\rtcp_utility.cc rtp_rtcp\source\rtp_receiver.cc rtp_rtcp\source\rtp_rtcp_impl.cc rtp_rtcp\source\tmmbr_help.cc rtp_rtcp\source\receiver_fec.cc rtp_rtcp\source\remote_rate_control.cc rtp_rtcp\source\rtp_format_vp8.cc rtp_rtcp\source\ssrc_database.cc rtp_rtcp\source\rtp_receiver_video.cc rtp_rtcp\source\forward_error_correction.cc rtp_rtcp\source\overuse_detector.cc rtp_rtcp\source\forward_error_correction_internal.cc rtp_rtcp\source\rtcp_sender.cc rtp_rtcp\source\bandwidth_management.cc rtp_rtcp\source\rtp_utility.cc rtp_rtcp\source\rtp_sender.cc rtp_rtcp\source\rtp_receiver_audio.cc rtp_rtcp\source\rtp_sender_video.cc rtp_rtcp\source\bitrate.cc rtp_rtcp\source\dtmf_queue.cc rtp_rtcp\source\rtp_sender_audio.cc rtp_rtcp\source\rtcp_receiver_help.cc rtp_rtcp\source\rtcp_receiver.cc /MP /we4389 
+         h263_information.cc
+         rtp_header_extension.cc
+         rtcp_utility.cc
+         rtp_receiver.cc
+         rtp_rtcp_impl.cc
+         tmmbr_help.cc
+         receiver_fec.cc
+         remote_rate_control.cc
+         rtp_format_vp8.cc
+         ssrc_database.cc
+         rtp_receiver_video.cc
+         forward_error_correction.cc
+         overuse_detector.cc
+         forward_error_correction_internal.cc
+         rtcp_sender.cc
+         bandwidth_management.cc
+         rtp_utility.cc
+         rtp_sender.cc
+         rtp_receiver_audio.cc
+         rtp_sender_video.cc
+         bitrate.cc
+         dtmf_queue.cc
+         rtp_sender_audio.cc
+         rtcp_receiver_help.cc
+         rtcp_receiver.cc
+     1>C:\Program Files\MSBuild\Microsoft.Cpp\v4.0\Microsoft.CppBuild.targets(1151,5): warning MSB8012: TargetPath(C:\cygwin\home\nsinha\original_ trunk\src\modules\../..\build\Debug\rtp_rtcp.lib) does not match the Library's OutputFile property value (C:\cygwin\home\nsinha\original_ trunk\build\Debug\lib\rtp_rtcp.lib). This may cause your project to build incorrectly. To correct this, please make sure that $(OutDir), $(TargetName) and $(TargetExt) property values match the value specified in %(Lib.OutputFile).
+       Lib:
+         C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\Lib.exe /OUT:"../..\build\Debug\lib\rtp_rtcp.lib" /LIBPATH:../../third_party/platformsdk_win7/files/Lib /LIBPATH:../../third_party/directxsdk/files/Lib/x86 /NOLOGO "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\rtp_rtcp\h263_information.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\rtp_rtcp\rtp_header_extension.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\rtp_rtcp\rtcp_utility.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\rtp_rtcp\rtp_receiver.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\rtp_rtcp\rtp_rtcp_impl.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\rtp_rtcp\tmmbr_help.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\rtp_rtcp\receiver_fec.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\rtp_rtcp\remote_rate_control.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\rtp_rtcp\rtp_format_vp8.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\rtp_rtcp\ssrc_database.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\rtp_rtcp\rtp_receiver_video.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\rtp_rtcp\forward_error_correction.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\rtp_rtcp\overuse_detector.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\rtp_rtcp\forward_error_correction_internal.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\rtp_rtcp\rtcp_sender.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\rtp_rtcp\bandwidth_management.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\rtp_rtcp\rtp_utility.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\rtp_rtcp\rtp_sender.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\rtp_rtcp\rtp_receiver_audio.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\rtp_rtcp\rtp_sender_video.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\rtp_rtcp\bitrate.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\rtp_rtcp\dtmf_queue.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\rtp_rtcp\rtp_sender_audio.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\rtp_rtcp\rtcp_receiver_help.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\rtp_rtcp\rtcp_receiver.obj" /ignore:4221 
+         rtp_rtcp.vcxproj -> C:\cygwin\home\nsinha\original_ trunk\src\modules\../..\build\Debug\rtp_rtcp.lib
+       FinalizeBuildStatus:
+         Deleting file "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\rtp_rtcp\rtp_rtcp.unsuccessfulbuild".
+         Touching "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\rtp_rtcp\rtp_rtcp.lastbuildstate".
+     1>Done Building Project "C:\cygwin\home\nsinha\original_ trunk\src\modules\rtp_rtcp.vcxproj" (rebuild target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:10.60

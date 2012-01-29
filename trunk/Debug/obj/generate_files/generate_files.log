@@ -1,0 +1,22 @@
+﻿Build started 1/12/2012 9:26:16 PM.
+     1>Project "C:\cygwin\home\nsinha\original_ trunk\third_party\yasm\generate_files.vcxproj" on node 2 (build target(s)).
+     1>InitializeBuildStatus:
+         Creating "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\generate_files\generate_files.unsuccessfulbuild" because "AlwaysCreate" was specified.
+       CustomBuild:
+         Generating yasm version file: ../..\build\Debug\/obj/global_intermediate/third_party/yasm/version.mac.
+       _generate_gperf:
+         yasm genperf for C:\cygwin\home\nsinha\original_ trunk\third_party\yasm\source\patched-yasm\modules\arch\x86\x86regtmod.gperf.
+         cmd.exe /C "C:\Documents and Settings\nsinha\Local Settings\Temp\d187a63f76c94796bbf3e1eb4b4dd2b9.cmd"
+         call "C:\cygwin\home\nsinha\original_ trunk\third_party\yasm\..\..\third_party\cygwin\setup_env.bat" && set CYGWIN=nontsec&& set OUTDIR=../..\build\Debug\&& set INPUTPATH=C:\cygwin\home\nsinha\original_ trunk\third_party\yasm\source\patched-yasm\modules\arch\x86\x86regtmod.gperf && bash -c "\"`cygpath -m \"${OUTDIR}\"`/genperf\" \"`cygpath -m \"${INPUTPATH}\"`\" \"`cygpath -m \"${OUTDIR}\"`/obj/global_intermediate/third_party/yasm/x86regtmod.c\""
+       _generate_gperf:
+         yasm genperf for C:\cygwin\home\nsinha\original_ trunk\third_party\yasm\source\patched-yasm\modules\arch\x86\x86cpu.gperf.
+         cmd.exe /C "C:\Documents and Settings\nsinha\Local Settings\Temp\03f6938015a6493f843a81d3f98376f7.cmd"
+         call "C:\cygwin\home\nsinha\original_ trunk\third_party\yasm\..\..\third_party\cygwin\setup_env.bat" && set CYGWIN=nontsec&& set OUTDIR=../..\build\Debug\&& set INPUTPATH=C:\cygwin\home\nsinha\original_ trunk\third_party\yasm\source\patched-yasm\modules\arch\x86\x86cpu.gperf && bash -c "\"`cygpath -m \"${OUTDIR}\"`/genperf\" \"`cygpath -m \"${INPUTPATH}\"`\" \"`cygpath -m \"${OUTDIR}\"`/obj/global_intermediate/third_party/yasm/x86cpu.c\""
+       FinalizeBuildStatus:
+         Deleting file "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\generate_files\generate_files.unsuccessfulbuild".
+         Touching "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\generate_files\generate_files.lastbuildstate".
+     1>Done Building Project "C:\cygwin\home\nsinha\original_ trunk\third_party\yasm\generate_files.vcxproj" (build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:06.23

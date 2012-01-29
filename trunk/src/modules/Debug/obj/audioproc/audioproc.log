@@ -1,0 +1,25 @@
+﻿Build started 12/19/2011 4:42:18 PM.
+     1>Project "C:\cygwin\home\nsinha\trunk\src\modules\audioproc.vcxproj" on node 2 (build target(s)).
+     1>C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\Microsoft.Common.Targets(1200,9): warning : The referenced project 'trunk\src\modules\audio_processing.vcxproj' does not exist.
+     1>C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\Microsoft.Common.Targets(1200,9): warning : The referenced project 'trunk\src\system_wrappers\source\system_wrappers.vcxproj' does not exist.
+     1>C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\Microsoft.Common.Targets(1200,9): warning : The referenced project 'trunk\testing\gtest.vcxproj' does not exist.
+     1>C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\Microsoft.Common.Targets(1200,9): warning : The referenced project 'trunk\src\modules\aec.vcxproj' does not exist.
+     1>C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\Microsoft.Common.Targets(1200,9): warning : The referenced project 'trunk\src\common_audio\signal_processing.vcxproj' does not exist.
+     1>C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\Microsoft.Common.Targets(1200,9): warning : The referenced project 'trunk\src\modules\apm_util.vcxproj' does not exist.
+     1>C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\Microsoft.Common.Targets(1200,9): warning : The referenced project 'trunk\src\modules\aecm.vcxproj' does not exist.
+     1>C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\Microsoft.Common.Targets(1200,9): warning : The referenced project 'trunk\src\modules\agc.vcxproj' does not exist.
+     1>C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\Microsoft.Common.Targets(1200,9): warning : The referenced project 'trunk\src\common_audio\vad.vcxproj' does not exist.
+     1>C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\Microsoft.Common.Targets(1200,9): warning : The referenced project 'trunk\src\modules\ns.vcxproj' does not exist.
+     1>C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\Microsoft.Common.Targets(1200,9): warning : The referenced project 'trunk\third_party\protobuf\protobuf_lite.vcxproj' does not exist.
+     1>C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\Microsoft.Common.Targets(1200,9): warning : The referenced project 'trunk\src\modules\audioproc_debug_proto.vcxproj' does not exist.
+     1>InitializeBuildStatus:
+         Touching "C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\audioproc\audioproc.unsuccessfulbuild".
+       ClCompile:
+         C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I.. /I..\.. /I..\..\third_party\wtl\include /Iaudio_processing\interface /Iinterface /I../..\build\Debug\obj\global_intermediate\protoc_out /I..\..\third_party\protobuf\vsprojects /I..\..\third_party\protobuf\src /I..\system_wrappers\interface /I..\..\testing\gtest\include /I..\..\third_party\platformsdk_win7\files\Include /I..\..\third_party\directxsdk\files\Include /I"C:\Program Files\Microsoft Visual Studio 10.0\\VC\atlmfc\include" /Zi /nologo /W4 /WX- /Od /Oy- /D _DEBUG /D _WIN32_WINNT=0x0601 /D WINVER=0x0601 /D WIN32 /D _WINDOWS /D NOMINMAX /D PSAPI_VERSION=1 /D _CRT_RAND_S /D CERT_CHAIN_PARA_HAS_EXTRA_FIELDS /D WIN32_LEAN_AND_MEAN /D _ATL_NO_OPENGL /D _HAS_EXCEPTIONS=0 /D _SECURE_ATL /D CHROMIUM_BUILD /D TOOLKIT_VIEWS=1 /D ENABLE_REMOTING=1 /D ENABLE_P2P_APIS=1 /D ENABLE_CONFIGURATION_POLICY /D ENABLE_INPUT_SPEECH /D ENABLE_GPU=1 /D ENABLE_EGLIMAGE=1 /D USE_SKIA=1 /D __STD_C /D _CRT_SECURE_NO_DEPRECATE /D _SCL_SECURE_NO_DEPRECATE /D ENABLE_REGISTER_PROTOCOL_HANDLER=1 /D WEBRTC_TARGET_PC /D GOOGLE_PROTOBUF_NO_RTTI /D UNIT_TEST /D __STDC_FORMAT_MACROS /D DYNAMIC_ANNOTATIONS_ENABLED=1 /D WTF_USE_DYNAMIC_ANNOTATIONS=1 /D _UNICODE /D UNICODE /Gm- /RTC1 /MTd /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /GR- /Fo"C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\audioproc\\" /Fd"C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\audioproc\vc100.pdb" /Gd /TP /wd4351 /wd4396 /wd4503 /wd4819 /wd4100 /wd4121 /wd4125 /wd4127 /wd4130 /wd4131 /wd4189 /wd4201 /wd4238 /wd4244 /wd4245 /wd4310 /wd4355 /wd4428 /wd4481 /wd4505 /wd4510 /wd4512 /wd4530 /wd4610 /wd4611 /wd4701 /wd4702 /wd4706 /wd4800 /wd4389 /analyze- /errorReport:prompt audio_processing\test\process_test.cc /MP /we4389 
+         process_test.cc
+     1>audio_processing\test\process_test.cc(27): fatal error C1083: Cannot open include file: 'webrtc/audio_processing/debug.pb.h': No such file or directory
+     1>Done Building Project "C:\cygwin\home\nsinha\trunk\src\modules\audioproc.vcxproj" (build target(s)) -- FAILED.
+
+Build FAILED.
+
+Time Elapsed 00:00:01.25

@@ -1,0 +1,12 @@
+﻿Build started 12/19/2011 4:34:56 PM.
+     1>Project "C:\cygwin\home\nsinha\trunk\third_party\yasm\config_sources.vcxproj" on node 2 (build target(s)).
+     1>InitializeBuildStatus:
+         Creating "C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\config_sources\config_sources.unsuccessfulbuild" because "AlwaysCreate" was specified.
+       FinalizeBuildStatus:
+         Deleting file "C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\config_sources\config_sources.unsuccessfulbuild".
+         Touching "C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\config_sources\config_sources.lastbuildstate".
+     1>Done Building Project "C:\cygwin\home\nsinha\trunk\third_party\yasm\config_sources.vcxproj" (build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:00.06

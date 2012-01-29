@@ -1,0 +1,198 @@
+﻿Build started 1/12/2012 9:01:22 PM.
+     1>Project "C:\cygwin\home\nsinha\original_ trunk\third_party_mods\libjingle\libjingle.vcxproj" on node 2 (rebuild target(s)).
+     1>InitializeBuildStatus:
+         Creating "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\libjingle.unsuccessfulbuild" because "AlwaysCreate" was specified.
+       ClCompile:
+         C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I..\..\third_party\libyuv\include /I..\..\src /I..\..\third_party\libjingle\source /I..\..\third_party\expat\files /I..\third_party\platformsdk_win7\files\Include /I..\..\third_party\wtl\include /I..\..\third_party\expat\files\lib /I..\..\third_party\jsoncpp\include /I..\..\third_party\platformsdk_win7\files\Include /I..\..\third_party\directxsdk\files\Include /I"C:\Program Files\Microsoft Visual Studio 10.0\\VC\atlmfc\include" /Zi /nologo /W3 /WX- /Od /Oy- /D _DEBUG /D FEATURE_ENABLE_SSL /D FEATURE_ENABLE_VOICEMAIL /D _USE_32BIT_TIME_T /D SAFE_TO_DEFINE_TALK_BASE_LOGGING_MACROS /D EXPAT_RELATIVE_PATH /D JSONCPP_RELATIVE_PATH /D WEBRTC_RELATIVE_PATH /D HAVE_WEBRTC /D HAVE_WEBRTC_VIDEO /D HAVE_WEBRTC_VOICE /D _WIN32_WINNT=0x0601 /D WINVER=0x0601 /D WIN32 /D _WINDOWS /D NOMINMAX /D PSAPI_VERSION=1 /D _CRT_RAND_S /D CERT_CHAIN_PARA_HAS_EXTRA_FIELDS /D WIN32_LEAN_AND_MEAN /D _ATL_NO_OPENGL /D _HAS_EXCEPTIONS=0 /D _SECURE_ATL /D CHROMIUM_BUILD /D TOOLKIT_VIEWS=1 /D ENABLE_REMOTING=1 /D ENABLE_P2P_APIS=1 /D ENABLE_CONFIGURATION_POLICY /D ENABLE_INPUT_SPEECH /D ENABLE_GPU=1 /D ENABLE_EGLIMAGE=1 /D USE_SKIA=1 /D __STD_C /D _CRT_SECURE_NO_DEPRECATE /D _SCL_SECURE_NO_DEPRECATE /D ENABLE_REGISTER_PROTOCOL_HANDLER=1 /D XML_STATIC /D _CRT_SECURE_NO_WARNINGS /D _CRT_NONSTDC_NO_WARNINGS /D _CRT_NONSTDC_NO_DEPRECATE /D DYNAMIC_ANNOTATIONS_ENABLED=1 /D WTF_USE_DYNAMIC_ANNOTATIONS=1 /D _DEBUG /D _UNICODE /D UNICODE /Gm- /RTC1 /MTd /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /GR- /Fo"C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\\" /Fd"C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\vc100.pdb" /Gd /TP /wd4351 /wd4396 /wd4503 /wd4819 /wd4100 /wd4121 /wd4125 /wd4127 /wd4130 /wd4131 /wd4189 /wd4201 /wd4238 /wd4244 /wd4245 /wd4310 /wd4355 /wd4428 /wd4481 /wd4505 /wd4510 /wd4512 /wd4530 /wd4610 /wd4611 /wd4701 /wd4702 /wd4706 /wd4800 /analyze- /errorReport:prompt ..\..\third_party\libjingle\source\talk\xmllite\qname.cc ..\..\third_party\libjingle\source\talk\xmllite\xmlelement.cc ..\..\third_party\libjingle\source\talk\xmllite\xmlconstants.cc ..\..\third_party\libjingle\source\talk\xmllite\xmlparser.cc ..\..\third_party\libjingle\source\talk\xmllite\xmlbuilder.cc ..\..\third_party\libjingle\source\talk\xmllite\xmlnsstack.cc ..\..\third_party\libjingle\source\talk\xmllite\xmlprinter.cc ..\..\third_party\libjingle\source\talk\xmpp\ratelimitmanager.cc ..\..\third_party\libjingle\source\talk\xmpp\xmppengineimpl_iq.cc ..\..\third_party\libjingle\source\talk\xmpp\xmppclient.cc ..\..\third_party\libjingle\source\talk\xmpp\xmpplogintask.cc ..\..\third_party\libjingle\source\talk\xmpp\jid.cc ..\..\third_party\libjingle\source\talk\xmpp\xmppstanzaparser.cc ..\..\third_party\libjingle\source\talk\xmpp\constants.cc ..\..\third_party\libjingle\source\talk\xmpp\saslmechanism.cc ..\..\third_party\libjingle\source\talk\xmpp\xmpptask.cc ..\..\third_party\libjingle\source\talk\xmpp\xmppengineimpl.cc ..\..\third_party\libjingle\source\talk\sound\soundsystemproxy.cc ..\..\third_party\libjingle\source\talk\sound\platformsoundsystemfactory.cc ..\..\third_party\libjingle\source\talk\sound\soundsysteminterface.cc ..\..\third_party\libjingle\source\talk\sound\platformsoundsystem.cc ..\..\third_party\libjingle\source\talk\base\asynchttprequest.cc ..\..\third_party\libjingle\source\talk\base\socketstream.cc ..\..\third_party\libjingle\source\talk\base\win32socketinit.cc ..\..\third_party\libjingle\source\talk\base\win32.cc ..\..\third_party\libjingle\source\talk\base\worker.cc ..\..\third_party\libjingle\source\talk\base\taskrunner.cc ..\..\third_party\libjingle\source\talk\base\autodetectproxy.cc ..\..\third_party\libjingle\source\talk\base\asynctcpsocket.cc ..\..\third_party\libjingle\source\talk\base\httpcommon.cc ..\..\third_party\libjingle\source\talk\base\signalthread.cc ..\..\third_party\libjingle\source\talk\base\sslsocketfactory.cc ..\..\third_party\libjingle\source\talk\base\checks.cc ..\..\third_party\libjingle\source\talk\base\json.cc ..\..\third_party\libjingle\source\talk\base\firewallsocketserver.cc ..\..\third_party\libjingle\source\talk\base\time.cc ..\..\third_party\libjingle\source\talk\base\basicpacketsocketfactory.cc ..\..\third_party\libjingle\source\talk\base\network.cc ..\..\third_party\libjingle\source\talk\base\stringencode.cc ..\..\third_party\libjingle\source\talk\base\nethelpers.cc ..\..\third_party\libjingle\source\talk\base\helpers.cc ..\..\third_party\libjingle\source\talk\base\stream.cc ..\..\third_party\libjingle\source\talk\base\stringdigest.cc ..\..\third_party\libjingle\source\talk\base\winfirewall.cc ..\..\third_party\libjingle\source\talk\base\urlencode.cc ..\..\third_party\libjingle\source\talk\base\winping.cc ..\..\third_party\libjingle\source\talk\base\httprequest.cc ..\..\third_party\libjingle\source\talk\base\messagequeue.cc ..\..\third_party\libjingle\source\talk\base\logging.cc ..\..\third_party\libjingle\source\talk\base\fileutils.cc ..\..\third_party\libjingle\source\talk\base\win32window.cc ..\..\third_party\libjingle\source\talk\base\ratetracker.cc ..\..\third_party\libjingle\source\talk\base\ipaddress.cc ..\..\third_party\libjingle\source\talk\base\asyncfile.cc ..\..\third_party\libjingle\source\talk\base\schanneladapter.cc ..\..\third_party\libjingle\source\talk\base\stringutils.cc ..\..\third_party\libjingle\source\talk\base\proxyinfo.cc ..\..\third_party\libjingle\source\talk\base\win32filesystem.cc ..\..\third_party\libjingle\source\talk\base\asyncsocket.cc ..\..\third_party\libjingle\source\talk\base\bytebuffer.cc ..\..\third_party\libjingle\source\talk\base\event.cc ..\..\third_party\libjingle\source\talk\base\httpclient.cc ..\..\third_party\libjingle\source\talk\base\flags.cc ..\..\third_party\libjingle\source\talk\base\socketadapters.cc ..\..\third_party\libjingle\source\talk\base\socketaddress.cc ..\..\third_party\libjingle\source\talk\base\physicalsocketserver.cc ..\..\third_party\libjingle\source\talk\base\host.cc ..\..\third_party\libjingle\source\talk\base\task.cc ..\..\third_party\libjingle\source\talk\base\socketpool.cc ..\..\third_party\libjingle\source\talk\base\proxydetect.cc ..\..\third_party\libjingle\source\talk\base\win32securityerrors.cc ..\..\third_party\libjingle\source\talk\base\thread.cc ..\..\third_party\libjingle\source\talk\base\messagehandler.cc ..\..\third_party\libjingle\source\talk\base\asyncudpsocket.cc ..\..\third_party\libjingle\source\talk\base\socketaddresspair.cc ..\..\third_party\libjingle\source\talk\base\taskparent.cc ..\..\third_party\libjingle\source\talk\base\common.cc ..\..\third_party\libjingle\source\talk\base\ssladapter.cc ..\..\third_party\libjingle\source\talk\base\pathutils.cc ..\..\third_party\libjingle\source\talk\base\httpbase.cc ..\..\third_party\libjingle\source\talk\base\base64.cc ..\..\third_party\libjingle\source\talk\base\diskcache.cc /MP 
+         qname.cc
+         xmlelement.cc
+         xmlconstants.cc
+         xmlparser.cc
+         xmlbuilder.cc
+         xmlnsstack.cc
+         xmlprinter.cc
+         ratelimitmanager.cc
+         xmppengineimpl_iq.cc
+         xmppclient.cc
+         xmpplogintask.cc
+         jid.cc
+         xmppstanzaparser.cc
+         constants.cc
+         saslmechanism.cc
+         xmpptask.cc
+         xmppengineimpl.cc
+         soundsystemproxy.cc
+         platformsoundsystemfactory.cc
+         soundsysteminterface.cc
+         platformsoundsystem.cc
+         asynchttprequest.cc
+         socketstream.cc
+         win32socketinit.cc
+         win32.cc
+         worker.cc
+         taskrunner.cc
+         autodetectproxy.cc
+         asynctcpsocket.cc
+         httpcommon.cc
+     1>..\..\third_party\libjingle\source\talk\base\httpcommon.cc(31): warning C4005: 'WIN32_LEAN_AND_MEAN' : macro redefinition
+                 command-line arguments :  see previous definition of 'WIN32_LEAN_AND_MEAN'
+         signalthread.cc
+         sslsocketfactory.cc
+         checks.cc
+         json.cc
+         firewallsocketserver.cc
+         time.cc
+     1>..\..\third_party\libjingle\source\talk\base\time.cc(33): warning C4005: 'WIN32_LEAN_AND_MEAN' : macro redefinition
+                 command-line arguments :  see previous definition of 'WIN32_LEAN_AND_MEAN'
+         basicpacketsocketfactory.cc
+         network.cc
+         stringencode.cc
+         nethelpers.cc
+         helpers.cc
+     1>..\..\third_party\libjingle\source\talk\base\helpers.cc(33): warning C4005: 'WIN32_LEAN_AND_MEAN' : macro redefinition
+                 command-line arguments :  see previous definition of 'WIN32_LEAN_AND_MEAN'
+         stream.cc
+         stringdigest.cc
+         winfirewall.cc
+         urlencode.cc
+         winping.cc
+         httprequest.cc
+         messagequeue.cc
+         logging.cc
+     1>..\..\third_party\libjingle\source\talk\base\logging.cc(29): warning C4005: 'WIN32_LEAN_AND_MEAN' : macro redefinition
+                 command-line arguments :  see previous definition of 'WIN32_LEAN_AND_MEAN'
+         fileutils.cc
+         win32window.cc
+         ratetracker.cc
+         ipaddress.cc
+         asyncfile.cc
+         schanneladapter.cc
+         stringutils.cc
+         proxyinfo.cc
+         win32filesystem.cc
+         asyncsocket.cc
+         bytebuffer.cc
+         event.cc
+         httpclient.cc
+         flags.cc
+         socketadapters.cc
+     1>..\..\third_party\libjingle\source\talk\base\socketadapters.cc(36): warning C4005: 'WIN32_LEAN_AND_MEAN' : macro redefinition
+                 command-line arguments :  see previous definition of 'WIN32_LEAN_AND_MEAN'
+         socketaddress.cc
+         physicalsocketserver.cc
+     1>..\..\third_party\libjingle\source\talk\base\physicalsocketserver.cc(44): warning C4005: 'WIN32_LEAN_AND_MEAN' : macro redefinition
+                 command-line arguments :  see previous definition of 'WIN32_LEAN_AND_MEAN'
+         host.cc
+         task.cc
+         socketpool.cc
+         proxydetect.cc
+         win32securityerrors.cc
+         thread.cc
+         messagehandler.cc
+         asyncudpsocket.cc
+         socketaddresspair.cc
+         taskparent.cc
+         common.cc
+     1>..\..\third_party\libjingle\source\talk\base\common.cc(33): warning C4005: 'WIN32_LEAN_AND_MEAN' : macro redefinition
+                 command-line arguments :  see previous definition of 'WIN32_LEAN_AND_MEAN'
+         ssladapter.cc
+         pathutils.cc
+         httpbase.cc
+         base64.cc
+         diskcache.cc
+         C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I..\..\third_party\libyuv\include /I..\..\src /I..\..\third_party\libjingle\source /I..\..\third_party\expat\files /I..\third_party\platformsdk_win7\files\Include /I..\..\third_party\wtl\include /I..\..\third_party\expat\files\lib /I..\..\third_party\jsoncpp\include /I..\..\third_party\platformsdk_win7\files\Include /I..\..\third_party\directxsdk\files\Include /I"C:\Program Files\Microsoft Visual Studio 10.0\\VC\atlmfc\include" /Zi /nologo /W3 /WX- /Od /Oy- /D _DEBUG /D FEATURE_ENABLE_SSL /D FEATURE_ENABLE_VOICEMAIL /D _USE_32BIT_TIME_T /D SAFE_TO_DEFINE_TALK_BASE_LOGGING_MACROS /D EXPAT_RELATIVE_PATH /D JSONCPP_RELATIVE_PATH /D WEBRTC_RELATIVE_PATH /D HAVE_WEBRTC /D HAVE_WEBRTC_VIDEO /D HAVE_WEBRTC_VOICE /D _WIN32_WINNT=0x0601 /D WINVER=0x0601 /D WIN32 /D _WINDOWS /D NOMINMAX /D PSAPI_VERSION=1 /D _CRT_RAND_S /D CERT_CHAIN_PARA_HAS_EXTRA_FIELDS /D WIN32_LEAN_AND_MEAN /D _ATL_NO_OPENGL /D _HAS_EXCEPTIONS=0 /D _SECURE_ATL /D CHROMIUM_BUILD /D TOOLKIT_VIEWS=1 /D ENABLE_REMOTING=1 /D ENABLE_P2P_APIS=1 /D ENABLE_CONFIGURATION_POLICY /D ENABLE_INPUT_SPEECH /D ENABLE_GPU=1 /D ENABLE_EGLIMAGE=1 /D USE_SKIA=1 /D __STD_C /D _CRT_SECURE_NO_DEPRECATE /D _SCL_SECURE_NO_DEPRECATE /D ENABLE_REGISTER_PROTOCOL_HANDLER=1 /D XML_STATIC /D _CRT_SECURE_NO_WARNINGS /D _CRT_NONSTDC_NO_WARNINGS /D _CRT_NONSTDC_NO_DEPRECATE /D DYNAMIC_ANNOTATIONS_ENABLED=1 /D WTF_USE_DYNAMIC_ANNOTATIONS=1 /D _DEBUG /D _UNICODE /D UNICODE /Gm- /RTC1 /MTd /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /GR- /Fo"C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\\" /Fd"C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\vc100.pdb" /Gd /TC /wd4351 /wd4396 /wd4503 /wd4819 /wd4100 /wd4121 /wd4125 /wd4127 /wd4130 /wd4131 /wd4189 /wd4201 /wd4238 /wd4244 /wd4245 /wd4310 /wd4355 /wd4428 /wd4481 /wd4505 /wd4510 /wd4512 /wd4530 /wd4610 /wd4611 /wd4701 /wd4702 /wd4706 /wd4800 /analyze- /errorReport:prompt ..\..\third_party\libjingle\source\talk\base\md5c.c /MP 
+         md5c.c
+     1>C:\Program Files\MSBuild\Microsoft.Cpp\v4.0\Microsoft.CppBuild.targets(1151,5): warning MSB8012: TargetPath(C:\cygwin\home\nsinha\original_ trunk\third_party_mods\libjingle\../..\build\Debug\libjingle.lib) does not match the Library's OutputFile property value (C:\cygwin\home\nsinha\original_ trunk\build\Debug\lib\libjingle.lib). This may cause your project to build incorrectly. To correct this, please make sure that $(OutDir), $(TargetName) and $(TargetExt) property values match the value specified in %(Lib.OutputFile).
+       Lib:
+         C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\Lib.exe /OUT:"../..\build\Debug\lib\libjingle.lib" /LIBPATH:../../third_party/platformsdk_win7/files/Lib /LIBPATH:../../third_party/directxsdk/files/Lib/x86 /NOLOGO "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\qname.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\xmlelement.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\xmlconstants.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\xmlparser.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\xmlbuilder.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\xmlnsstack.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\xmlprinter.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\ratelimitmanager.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\xmppengineimpl_iq.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\xmppclient.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\xmpplogintask.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\jid.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\xmppstanzaparser.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\constants.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\saslmechanism.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\xmpptask.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\xmppengineimpl.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\soundsystemproxy.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\platformsoundsystemfactory.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\soundsysteminterface.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\platformsoundsystem.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\asynchttprequest.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\socketstream.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\win32socketinit.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\win32.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\worker.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\taskrunner.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\autodetectproxy.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\asynctcpsocket.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\httpcommon.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\signalthread.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\sslsocketfactory.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\checks.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\json.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\firewallsocketserver.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\time.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\basicpacketsocketfactory.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\network.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\stringencode.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\nethelpers.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\helpers.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\stream.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\stringdigest.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\winfirewall.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\urlencode.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\winping.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\httprequest.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\messagequeue.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\logging.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\fileutils.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\win32window.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\ratetracker.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\ipaddress.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\asyncfile.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\md5c.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\schanneladapter.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\stringutils.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\proxyinfo.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\win32filesystem.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\asyncsocket.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\bytebuffer.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\event.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\httpclient.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\flags.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\socketadapters.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\socketaddress.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\physicalsocketserver.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\host.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\task.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\socketpool.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\proxydetect.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\win32securityerrors.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\thread.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\messagehandler.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\asyncudpsocket.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\socketaddresspair.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\taskparent.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\common.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\ssladapter.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\pathutils.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\httpbase.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\base64.obj"
+         "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\diskcache.obj" /ignore:4221 
+         libjingle.vcxproj -> C:\cygwin\home\nsinha\original_ trunk\third_party_mods\libjingle\../..\build\Debug\libjingle.lib
+       FinalizeBuildStatus:
+         Deleting file "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\libjingle.unsuccessfulbuild".
+         Touching "C:\cygwin\home\nsinha\original_ trunk\Debug\obj\libjingle\libjingle.lastbuildstate".
+     1>Done Building Project "C:\cygwin\home\nsinha\original_ trunk\third_party_mods\libjingle\libjingle.vcxproj" (rebuild target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:01:38.67

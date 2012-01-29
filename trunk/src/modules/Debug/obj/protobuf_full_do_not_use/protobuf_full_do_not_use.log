@@ -1,0 +1,55 @@
+﻿Build started 12/19/2011 4:33:59 PM.
+     1>Project "C:\cygwin\home\nsinha\trunk\third_party\protobuf\protobuf_full_do_not_use.vcxproj" on node 3 (build target(s)).
+     1>InitializeBuildStatus:
+         Creating "C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\protobuf_full_do_not_use\protobuf_full_do_not_use.unsuccessfulbuild" because "AlwaysCreate" was specified.
+       ClCompile:
+         C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I..\..\third_party\wtl\include /Ivsprojects /Isrc /I..\..\third_party\platformsdk_win7\files\Include /I..\..\third_party\directxsdk\files\Include /I"C:\Program Files\Microsoft Visual Studio 10.0\\VC\atlmfc\include" /Zi /nologo /W3 /WX- /Od /Oy- /D _DEBUG /D _WIN32_WINNT=0x0601 /D WINVER=0x0601 /D WIN32 /D _WINDOWS /D NOMINMAX /D PSAPI_VERSION=1 /D _CRT_RAND_S /D CERT_CHAIN_PARA_HAS_EXTRA_FIELDS /D _ATL_NO_OPENGL /D _HAS_EXCEPTIONS=0 /D _SECURE_ATL /D CHROMIUM_BUILD /D TOOLKIT_VIEWS=1 /D ENABLE_REMOTING=1 /D ENABLE_P2P_APIS=1 /D ENABLE_CONFIGURATION_POLICY /D ENABLE_INPUT_SPEECH /D ENABLE_GPU=1 /D ENABLE_EGLIMAGE=1 /D USE_SKIA=1 /D __STD_C /D _CRT_SECURE_NO_DEPRECATE /D _SCL_SECURE_NO_DEPRECATE /D ENABLE_REGISTER_PROTOCOL_HANDLER=1 /D GOOGLE_PROTOBUF_NO_RTTI /D _CRT_NONSTDC_NO_WARNINGS /D _CRT_NONSTDC_NO_DEPRECATE /D DYNAMIC_ANNOTATIONS_ENABLED=1 /D WTF_USE_DYNAMIC_ANNOTATIONS=1 /D _UNICODE /D UNICODE /Gm- /RTC1 /MTd /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /GR- /Fo"C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\protobuf_full_do_not_use\\" /Fd"C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\protobuf_full_do_not_use\vc100.pdb" /Gd /TP /wd4018 /wd4244 /wd4355 /wd4351 /wd4396 /wd4503 /wd4819 /wd4100 /wd4121 /wd4125 /wd4127 /wd4130 /wd4131 /wd4189 /wd4201 /wd4238 /wd4245 /wd4310 /wd4428 /wd4481 /wd4505 /wd4510 /wd4512 /wd4530 /wd4610 /wd4611 /wd4701 /wd4702 /wd4706 /wd4800 /analyze- /errorReport:prompt src\google\protobuf\wire_format.cc src\google\protobuf\text_format.cc src\google\protobuf\extension_set_heavy.cc src\google\protobuf\service.cc src\google\protobuf\reflection_ops.cc src\google\protobuf\dynamic_message.cc src\google\protobuf\descriptor.cc src\google\protobuf\message.cc src\google\protobuf\generated_message_reflection.cc src\google\protobuf\descriptor_database.cc src\google\protobuf\descriptor.pb.cc src\google\protobuf\stubs\substitute.cc src\google\protobuf\stubs\strutil.cc src\google\protobuf\stubs\structurally_valid.cc src\google\protobuf\io\tokenizer.cc src\google\protobuf\io\printer.cc src\google\protobuf\io\zero_copy_stream_impl.cc src\google\protobuf\compiler\importer.cc src\google\protobuf\compiler\parser.cc /MP 
+         wire_format.cc
+         text_format.cc
+         extension_set_heavy.cc
+         service.cc
+         reflection_ops.cc
+         dynamic_message.cc
+         descriptor.cc
+         message.cc
+         generated_message_reflection.cc
+         descriptor_database.cc
+         descriptor.pb.cc
+         substitute.cc
+         strutil.cc
+         structurally_valid.cc
+         tokenizer.cc
+         printer.cc
+         zero_copy_stream_impl.cc
+         importer.cc
+         parser.cc
+     1>C:\Program Files\MSBuild\Microsoft.Cpp\v4.0\Microsoft.CppBuild.targets(1151,5): warning MSB8012: TargetPath(C:\cygwin\home\nsinha\trunk\third_party\protobuf\../..\build\Debug\protobuf_full_do_not_use.lib) does not match the Library's OutputFile property value (C:\cygwin\home\nsinha\trunk\build\Debug\lib\protobuf_full_do_not_use.lib). This may cause your project to build incorrectly. To correct this, please make sure that $(OutDir), $(TargetName) and $(TargetExt) property values match the value specified in %(Lib.OutputFile).
+       Lib:
+         C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\Lib.exe /OUT:"../..\build\Debug\lib\protobuf_full_do_not_use.lib" /LIBPATH:../../third_party/platformsdk_win7/files/Lib /LIBPATH:../../third_party/directxsdk/files/Lib/x86 /NOLOGO C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\protobuf_full_do_not_use\wire_format.obj
+         C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\protobuf_full_do_not_use\text_format.obj
+         C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\protobuf_full_do_not_use\extension_set_heavy.obj
+         C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\protobuf_full_do_not_use\service.obj
+         C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\protobuf_full_do_not_use\reflection_ops.obj
+         C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\protobuf_full_do_not_use\dynamic_message.obj
+         C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\protobuf_full_do_not_use\descriptor.obj
+         C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\protobuf_full_do_not_use\message.obj
+         C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\protobuf_full_do_not_use\generated_message_reflection.obj
+         C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\protobuf_full_do_not_use\descriptor_database.obj
+         C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\protobuf_full_do_not_use\descriptor.pb.obj
+         C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\protobuf_full_do_not_use\substitute.obj
+         C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\protobuf_full_do_not_use\strutil.obj
+         C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\protobuf_full_do_not_use\structurally_valid.obj
+         C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\protobuf_full_do_not_use\tokenizer.obj
+         C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\protobuf_full_do_not_use\printer.obj
+         C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\protobuf_full_do_not_use\zero_copy_stream_impl.obj
+         C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\protobuf_full_do_not_use\importer.obj
+         C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\protobuf_full_do_not_use\parser.obj /ignore:4221 
+         protobuf_full_do_not_use.vcxproj -> C:\cygwin\home\nsinha\trunk\third_party\protobuf\../..\build\Debug\protobuf_full_do_not_use.lib
+       FinalizeBuildStatus:
+         Deleting file "C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\protobuf_full_do_not_use\protobuf_full_do_not_use.unsuccessfulbuild".
+         Touching "C:\cygwin\home\nsinha\trunk\src\modules\Debug\obj\protobuf_full_do_not_use\protobuf_full_do_not_use.lastbuildstate".
+     1>Done Building Project "C:\cygwin\home\nsinha\trunk\third_party\protobuf\protobuf_full_do_not_use.vcxproj" (build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:14.90

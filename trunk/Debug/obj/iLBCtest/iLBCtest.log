@@ -1,0 +1,29 @@
+﻿Build started 12/19/2011 4:11:19 PM.
+     1>Project "C:\cygwin\home\nsinha\trunk\src\modules\iLBCtest.vcxproj" on node 3 (build target(s)).
+     1>C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\Microsoft.Common.Targets(1200,9): warning : The referenced project 'src\modules\iLBC.vcxproj' does not exist.
+     1>C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\Microsoft.Common.Targets(1200,9): warning : The referenced project 'src\common_audio\signal_processing.vcxproj' does not exist.
+     1>InitializeBuildStatus:
+         Creating "C:\cygwin\home\nsinha\trunk\Debug\obj\iLBCtest\iLBCtest.unsuccessfulbuild" because "AlwaysCreate" was specified.
+       ClCompile:
+         C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I.. /I..\.. /I..\..\third_party\wtl\include /Iaudio_coding\codecs\ilbc\interface /I..\..\third_party\platformsdk_win7\files\Include /I..\..\third_party\directxsdk\files\Include /I"C:\Program Files\Microsoft Visual Studio 10.0\\VC\atlmfc\include" /Zi /nologo /W4 /WX- /Od /Oy- /D _DEBUG /D _WIN32_WINNT=0x0601 /D WINVER=0x0601 /D WIN32 /D _WINDOWS /D NOMINMAX /D PSAPI_VERSION=1 /D _CRT_RAND_S /D CERT_CHAIN_PARA_HAS_EXTRA_FIELDS /D WIN32_LEAN_AND_MEAN /D _ATL_NO_OPENGL /D _HAS_EXCEPTIONS=0 /D _SECURE_ATL /D CHROMIUM_BUILD /D TOOLKIT_VIEWS=1 /D ENABLE_REMOTING=1 /D ENABLE_P2P_APIS=1 /D ENABLE_CONFIGURATION_POLICY /D ENABLE_INPUT_SPEECH /D ENABLE_GPU=1 /D ENABLE_EGLIMAGE=1 /D USE_SKIA=1 /D __STD_C /D _CRT_SECURE_NO_DEPRECATE /D _SCL_SECURE_NO_DEPRECATE /D ENABLE_REGISTER_PROTOCOL_HANDLER=1 /D WEBRTC_TARGET_PC /D __STDC_FORMAT_MACROS /D DYNAMIC_ANNOTATIONS_ENABLED=1 /D WTF_USE_DYNAMIC_ANNOTATIONS=1 /D _UNICODE /D UNICODE /Gm- /RTC1 /MTd /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /GR- /Fo"C:\cygwin\home\nsinha\trunk\Debug\obj\iLBCtest\\" /Fd"C:\cygwin\home\nsinha\trunk\Debug\obj\iLBCtest\vc100.pdb" /Gd /TC /wd4351 /wd4396 /wd4503 /wd4819 /wd4100 /wd4121 /wd4125 /wd4127 /wd4130 /wd4131 /wd4189 /wd4201 /wd4238 /wd4244 /wd4245 /wd4310 /wd4355 /wd4428 /wd4481 /wd4505 /wd4510 /wd4512 /wd4530 /wd4610 /wd4611 /wd4701 /wd4702 /wd4706 /wd4389 /analyze- /errorReport:prompt audio_coding\codecs\ilbc\test\iLBC_test.c /MP /we4389 
+         iLBC_test.c
+       ManifestResourceCompile:
+         C:\Program Files\Microsoft SDKs\Windows\v7.0A\bin\rc.exe /nologo /fo"C:\cygwin\home\nsinha\trunk\Debug\obj\iLBCtest\iLBCtest.exe.embed.manifest.res" C:\cygwin\home\nsinha\trunk\Debug\obj\iLBCtest\iLBCtest_manifest.rc 
+       Link:
+         C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"../..\build\Debug\iLBCtest.exe" /INCREMENTAL /NOLOGO /LIBPATH:../../third_party/platformsdk_win7/files/Lib /LIBPATH:../../third_party/directxsdk/files/Lib/x86 wininet.lib dnsapi.lib version.lib msimg32.lib ws2_32.lib usp10.lib psapi.lib dbghelp.lib winmm.lib shlwapi.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib Delayimp.lib /DELAYLOAD:dbghelp.dll /DELAYLOAD:dwmapi.dll /DELAYLOAD:uxtheme.dll /MANIFEST /ManifestFile:"C:\cygwin\home\nsinha\trunk\Debug\obj\iLBCtest\iLBCtest.exe.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"C:\cygwin\home\nsinha\trunk\build\Debug\iLBCtest.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE:NO /FIXED:NO /NXCOMPAT /IMPLIB:"../..\build\Debug\lib\iLBCtest.lib" /MACHINE:X86 C:\cygwin\home\nsinha\trunk\Debug\obj\iLBCtest\iLBCtest.exe.embed.manifest.res
+         C:\cygwin\home\nsinha\trunk\Debug\obj\iLBCtest\iLBC_test.obj /safeseh /dynamicbase /ignore:4199 /ignore:4221 /nxcompat 
+     1>iLBC_test.obj : error LNK2019: unresolved external symbol _WebRtcIlbcfix_DecoderFree referenced in function _main
+     1>iLBC_test.obj : error LNK2019: unresolved external symbol _WebRtcIlbcfix_EncoderFree referenced in function _main
+     1>iLBC_test.obj : error LNK2019: unresolved external symbol _WebRtcIlbcfix_DecodePlc referenced in function _main
+     1>iLBC_test.obj : error LNK2019: unresolved external symbol _WebRtcIlbcfix_Decode referenced in function _main
+     1>iLBC_test.obj : error LNK2019: unresolved external symbol _WebRtcIlbcfix_Encode referenced in function _main
+     1>iLBC_test.obj : error LNK2019: unresolved external symbol _WebRtcIlbcfix_DecoderInit referenced in function _main
+     1>iLBC_test.obj : error LNK2019: unresolved external symbol _WebRtcIlbcfix_EncoderInit referenced in function _main
+     1>iLBC_test.obj : error LNK2019: unresolved external symbol _WebRtcIlbcfix_DecoderCreate referenced in function _main
+     1>iLBC_test.obj : error LNK2019: unresolved external symbol _WebRtcIlbcfix_EncoderCreate referenced in function _main
+     1>../..\build\Debug\iLBCtest.exe : fatal error LNK1120: 9 unresolved externals
+     1>Done Building Project "C:\cygwin\home\nsinha\trunk\src\modules\iLBCtest.vcxproj" (build target(s)) -- FAILED.
+
+Build FAILED.
+
+Time Elapsed 00:00:01.23
