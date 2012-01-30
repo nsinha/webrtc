@@ -181,10 +181,21 @@ int WebRtcAec_InitAec(aec_t *aec, int sampFreq);
 void WebRtcAec_InitAec_SSE2(void);
 
 void WebRtcAec_InitMetrics(aec_t *aec);
+#if (DITECH_VERSION==1)
 void WebRtcAec_ProcessFrame(aec_t *aec, const short *farend,
                        const short *nearend, const short *nearendH,
                        short *out, short *outH,
                        int knownDelay);
+#else
+#if (DITECH_VERSION==2)
+void WebRtcAec_ProcessFrame(aec_t *aec, const short *farend,
+                       const short *nearend, const short *nearendH,
+                       short *out, short *outH,
+                       int knownDelay,short vadState);
+#else
+#error DITECH_VERSION undefined
+#endif
+#endif
 
 #endif // WEBRTC_MODULES_AUDIO_PROCESSING_AEC_MAIN_SOURCE_AEC_CORE_H_
 

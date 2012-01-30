@@ -11,7 +11,8 @@
 /*
  * The core AEC algorithm, which is presented with time-aligned signals.
  */
-
+#define FFT_NISH
+short FFT(short int dir,int m,float *x,float *y);
 #include "aec_core.h"
 
 #include <math.h>
@@ -99,9 +100,19 @@ const float WebRtcAec_overDriveCurve[65] = {
 };
 
 // "Private" function prototypes.
+#if (DITECH_VERSION==1)
 static void ProcessBlock(aec_t *aec, const short *farend,
                               const short *nearend, const short *nearendH,
                               short *out, short *outH);
+#else
+#if (DITECH_VERSION==2)
+static void ProcessBlock(aec_t *aec, const short *farend,
+                              const short *nearend, const short *nearendH,
+                              short *out, short *outH,short vadState);
+#else
+#error DITECH_VERSION undefined
+#endif
+#endif
 
 static void BufferFar(aec_t *aec, const short *farend, int farLen);
 static void FetchFar(aec_t *aec, short *farend, int farLen, int knownDelay);
@@ -275,7 +286,7 @@ static void ScaleErrorSignal(aec_t *aec, float ef[2][PART_LEN1])
 //    }
 //  }
 //}
-
+#if (DITECH_VERSION==1)
 static void FilterAdaptation(aec_t *aec, float *fft, float ef[2][PART_LEN1]) {
   int i, j;
   for (i = 0; i < NR_PART; i++) {
@@ -327,6 +338,74 @@ static void FilterAdaptation(aec_t *aec, float *fft, float ef[2][PART_LEN1]) {
 	//fwrite(aec->wfBuf[1], sizeof(float), NR_PART * PART_LEN1, aec->filterFile1);
 #endif
 }
+#else
+#if (DITECH_VERSION==2)
+static void FilterAdaptation(aec_t *aec, float *fft, float ef[2][PART_LEN1]) {
+  int i, j;
+  for (i = 0; i < NR_PART; i++) {
+    int xPos = (i + aec->xfBufBlockPos)*(PART_LEN1);
+    int pos;
+    // Check for wrap
+    if (i + aec->xfBufBlockPos >= NR_PART) {
+      xPos -= NR_PART * PART_LEN1;
+    }
+
+    pos = i * PART_LEN1;
+
+#ifndef UNCONSTR
+    for (j = 0; j < PART_LEN1; j++) {
+      aec->wfBuf[0][pos + j] += MulRe(aec->xfBuf[0][xPos + j],
+                         -aec->xfBuf[1][xPos + j],
+                         ef[0][j], ef[1][j]);
+      aec->wfBuf[1][pos + j] += MulIm(aec->xfBuf[0][xPos + j],
+                             -aec->xfBuf[1][xPos + j],
+                             ef[0][j], ef[1][j]);
+    }
+#else
+    for (j = 0; j < PART_LEN; j++) {
+
+      fft[2 * j] = MulRe(aec->xfBuf[0][xPos + j],
+                         -aec->xfBuf[1][xPos + j],
+                         ef[0][j], ef[1][j]);
+      fft[2 * j + 1] = MulIm(aec->xfBuf[0][xPos + j],
+                             -aec->xfBuf[1][xPos + j],
+                             ef[0][j], ef[1][j]);
+    }
+    fft[1] = MulRe(aec->xfBuf[0][xPos + PART_LEN],
+                   -aec->xfBuf[1][xPos + PART_LEN],
+                   ef[0][PART_LEN], ef[1][PART_LEN]);
+
+    aec_rdft_inverse_128(fft);
+    memset(fft + PART_LEN, 0, sizeof(float) * PART_LEN);
+
+    // fft scaling
+    {
+      float scale = 2.0f / PART_LEN2;
+      for (j = 0; j < PART_LEN; j++) {
+        fft[j] *= scale;
+      }
+    }
+    aec_rdft_forward_128(fft);
+
+    aec->wfBuf[0][pos] += fft[0];
+    aec->wfBuf[0][pos + PART_LEN] += fft[1];
+
+    for (j = 1; j < PART_LEN; j++) {
+      aec->wfBuf[0][pos + j] += fft[2 * j];
+      aec->wfBuf[1][pos + j] += fft[2 * j + 1];
+    }
+#endif // UNCONSTR
+  }
+
+#ifdef WEBRTC_AEC_DEBUG_DUMP
+	fwrite(aec->wfBuf[0], sizeof(float), NR_PART * PART_LEN1, aec->filterFile0);
+	//fwrite(aec->wfBuf[1], sizeof(float), NR_PART * PART_LEN1, aec->filterFile1);
+#endif
+}
+#else
+#error DITECH_VERSION undefined
+#endif
+#endif
 
 static void OverdriveAndSuppress(aec_t *aec, float hNl[PART_LEN1],
                                  const float hNlFb,
@@ -513,7 +592,7 @@ void WebRtcAec_InitMetrics(aec_t *aec)
     WebRtcAec_InitStats(&aec->rerl);
 }
 
-
+#if (DITECH_VERSION==1)
 void WebRtcAec_ProcessFrame(aec_t *aec, const short *farend,
                        const short *nearend, const short *nearendH,
                        short *out, short *outH,
@@ -525,15 +604,6 @@ void WebRtcAec_ProcessFrame(aec_t *aec, const short *farend,
     short nearBlH[PART_LEN], outBlH[PART_LEN];
 
     int size = 0;
-#if (DITECH_VERSION==1)
-#else
-#if (DITECH_VERSION==2)
-		if(aec->adaptIsOff>0)
-		aec->adaptIsOff--;
-#else
-#error DITECH_VERSION undefined
-#endif
-#endif
 
     // initialize: only used for SWB
     memset(nearBlH, 0, sizeof(nearBlH));
@@ -590,7 +660,84 @@ void WebRtcAec_ProcessFrame(aec_t *aec, const short *farend,
         WebRtcApm_ReadBuffer(aec->outFrBufH, outH, FRAME_LEN);
     }
 }
+#else
+#if (DITECH_VERSION==2)
+void WebRtcAec_ProcessFrame(aec_t *aec, const short *farend,
+                       const short *nearend, const short *nearendH,
+                       short *out, short *outH,
+                       int knownDelay,short vadState)
+{
+    short farBl[PART_LEN], nearBl[PART_LEN], outBl[PART_LEN];
+    short farFr[FRAME_LEN];
+    // For H band
+    short nearBlH[PART_LEN], outBlH[PART_LEN];
 
+    int size = 0;
+
+	if(aec->adaptIsOff>0)
+		aec->adaptIsOff--;
+
+
+    // initialize: only used for SWB
+    memset(nearBlH, 0, sizeof(nearBlH));
+    memset(outBlH, 0, sizeof(outBlH));
+
+    // Buffer the current frame.
+    // Fetch an older one corresponding to the delay.
+    BufferFar(aec, farend, FRAME_LEN);
+    FetchFar(aec, farFr, FRAME_LEN, knownDelay);
+
+    // Buffer the synchronized far and near frames,
+    // to pass the smaller blocks individually.
+    WebRtcApm_WriteBuffer(aec->farFrBuf, farFr, FRAME_LEN);
+    WebRtcApm_WriteBuffer(aec->nearFrBuf, nearend, FRAME_LEN);
+    // For H band
+    if (aec->sampFreq == 32000) {
+        WebRtcApm_WriteBuffer(aec->nearFrBufH, nearendH, FRAME_LEN);
+    }
+
+    // Process as many blocks as possible.
+    while (WebRtcApm_get_buffer_size(aec->farFrBuf) >= PART_LEN) {
+
+        WebRtcApm_ReadBuffer(aec->farFrBuf, farBl, PART_LEN);
+        WebRtcApm_ReadBuffer(aec->nearFrBuf, nearBl, PART_LEN);
+
+        // For H band
+        if (aec->sampFreq == 32000) {
+            WebRtcApm_ReadBuffer(aec->nearFrBufH, nearBlH, PART_LEN);
+        }
+
+        ProcessBlock(aec, farBl, nearBl, nearBlH, outBl, outBlH,vadState);
+
+        WebRtcApm_WriteBuffer(aec->outFrBuf, outBl, PART_LEN);
+        // For H band
+        if (aec->sampFreq == 32000) {
+            WebRtcApm_WriteBuffer(aec->outFrBufH, outBlH, PART_LEN);
+        }
+    }
+
+    // Stuff the out buffer if we have less than a frame to output.
+    // This should only happen for the first frame.
+    size = WebRtcApm_get_buffer_size(aec->outFrBuf);
+    if (size < FRAME_LEN) {
+        WebRtcApm_StuffBuffer(aec->outFrBuf, FRAME_LEN - size);
+        if (aec->sampFreq == 32000) {
+            WebRtcApm_StuffBuffer(aec->outFrBufH, FRAME_LEN - size);
+        }
+    }
+
+    // Obtain an output frame.
+    WebRtcApm_ReadBuffer(aec->outFrBuf, out, FRAME_LEN);
+    // For H band
+    if (aec->sampFreq == 32000) {
+        WebRtcApm_ReadBuffer(aec->outFrBufH, outH, FRAME_LEN);
+    }
+}
+#else
+#error DITECH_VERSION undefined
+#endif
+#endif
+#if (DITECH_VERSION==1)
 static void ProcessBlock(aec_t *aec, const short *farend,
                          const short *nearend, const short *nearendH,
                          short *output, short *outputH)
@@ -600,7 +747,7 @@ static void ProcessBlock(aec_t *aec, const short *farend,
     short eInt16[PART_LEN];
     float scale;
 
-    float fft[PART_LEN2];
+    float fft[PART_LEN2],fft_re[PART_LEN2],fft_im[PART_LEN2];
     float xf[2][PART_LEN1], yf[2][PART_LEN1], ef[2][PART_LEN1];
     complex_t df[PART_LEN1];
     float far_spectrum = 0.0f;
@@ -642,22 +789,48 @@ static void ProcessBlock(aec_t *aec, const short *farend,
     if (aec->sampFreq == 32000) {
         memcpy(aec->dBufH + PART_LEN, dH, sizeof(float) * PART_LEN);
     }
+#ifdef FFT_NISH
+	memcpy(fft_re,fft,sizeof(float) * PART_LEN2);
+	memset(fft_im,0,sizeof(float) * PART_LEN2);
+	FFT(0,7,fft_re,fft_im);
+	xf[0][PART_LEN] = 0;
+	xf[1][PART_LEN] = 0;
+	for (i = 0; i < PART_LEN; i++) {
+        xf[0][i] = fft_re[i];
+        xf[1][i] = fft_im[i];
+    }
 
+#else
     aec_rdft_forward_128(fft);
+
+	
 
     // Far fft
     xf[1][0] = 0;
     xf[1][PART_LEN] = 0;
     xf[0][0] = fft[0];
-    xf[0][PART_LEN] = fft[1];
+    xf[0][PART_LEN] = 0;//fft[1];
 
     for (i = 1; i < PART_LEN; i++) {
         xf[0][i] = fft[2 * i];
         xf[1][i] = fft[2 * i + 1];
     }
+#endif
 
     // Near fft
     memcpy(fft, aec->dBuf, sizeof(float) * PART_LEN2);
+#ifdef FFT_NISH
+	memcpy(fft_re,fft,sizeof(float) * PART_LEN2);
+	memset(fft_im,0,sizeof(float) * PART_LEN2);
+	FFT(0,7,fft_re,fft_im);
+	df[PART_LEN][0]= 0;
+	df[PART_LEN][1] = 0;
+	for (i = 0; i < PART_LEN; i++) {
+        df[i][0] = fft_re[i];
+        df[i][1] = fft_im[i];
+    }
+
+#else
     aec_rdft_forward_128(fft);
     df[0][1] = 0;
     df[PART_LEN][1] = 0;
@@ -668,6 +841,7 @@ static void ProcessBlock(aec_t *aec, const short *farend,
         df[i][0] = fft[2 * i];
         df[i][1] = fft[2 * i + 1];
     }
+#endif
 
     // Power smoothing
     for (i = 0; i < PART_LEN1; i++) {
@@ -745,7 +919,25 @@ static void ProcessBlock(aec_t *aec, const short *farend,
 
     // Filter far
     WebRtcAec_FilterFar(aec, yf);
+#ifdef FFT_NISH
+    // Inverse fft to obtain echo estimate and error.
+    //fft_re[0] = yf[0][0];
+	//fft_im[0] = 0;
+    //fft[1] = yf[0][PART_LEN];
+	memset(fft_re,0,sizeof(float) * PART_LEN2);
+	memset(fft_im,0,sizeof(float) * PART_LEN2);
+    for (i = 0; i < PART_LEN; i++) {
+        fft_re[i] = yf[0][i];
+        fft_im[i] = yf[1][i];
+    }
+	
+	FFT(1,7,fft_re,fft_im);
+	for (i = 0; i < PART_LEN; i++) 
+	{
+        y[i] = fft_re[PART_LEN + i];
+	}
 
+#else
     // Inverse fft to obtain echo estimate and error.
     fft[0] = yf[0][0];
     fft[1] = yf[0][PART_LEN];
@@ -759,11 +951,28 @@ static void ProcessBlock(aec_t *aec, const short *farend,
     for (i = 0; i < PART_LEN; i++) {
         y[i] = fft[PART_LEN + i] * scale; // fft scaling
     }
+#endif
 
     for (i = 0; i < PART_LEN; i++) {
         e[i] = d[i] - y[i];
     }
+#ifdef FFT_NISH
+	 memcpy(aec->eBuf + PART_LEN, e, sizeof(float) * PART_LEN);
+	 memset(fft, 0, sizeof(float) * PART_LEN);
+     memcpy(fft + PART_LEN, e, sizeof(float) * PART_LEN);
+	 memcpy(fft_re,fft,sizeof(float) * PART_LEN2);
+	 memset(fft_im,0,sizeof(float) * PART_LEN2);
 
+	 FFT(0,7,fft_re,fft_im);
+	 ef[0][PART_LEN] = 0;
+	 ef[1][PART_LEN] = 0;
+	 for (i = 0; i < PART_LEN; i++) 
+	 {
+        ef[0][i] = fft_re[i];
+        ef[1][i] = fft_im[i];
+	 }
+	 ef[1][0] = 0;
+#else
     // Error fft
     memcpy(aec->eBuf + PART_LEN, e, sizeof(float) * PART_LEN);
     memset(fft, 0, sizeof(float) * PART_LEN);
@@ -778,6 +987,7 @@ static void ProcessBlock(aec_t *aec, const short *farend,
         ef[0][i] = fft[2 * i];
         ef[1][i] = fft[2 * i + 1];
     }
+#endif
 
     // Scale error signal inversely with far power.
     WebRtcAec_ScaleErrorSignal(aec, ef);
@@ -819,6 +1029,303 @@ static void ProcessBlock(aec_t *aec, const short *farend,
     fwrite(output, sizeof(int16_t), PART_LEN, aec->outFile);
 #endif
 }
+#else
+#if (DITECH_VERSION==2)
+static void ProcessBlock(aec_t *aec, const short *farend,
+                         const short *nearend, const short *nearendH,
+                         short *output, short *outputH,short vadState)
+{
+    int i;
+    float d[PART_LEN], y[PART_LEN], e[PART_LEN], dH[PART_LEN];
+    short eInt16[PART_LEN];
+    float scale;
+
+    float fft[PART_LEN2],fft_re[PART_LEN2],fft_im[PART_LEN2];
+    float xf[2][PART_LEN1], yf[2][PART_LEN1], ef[2][PART_LEN1];
+    complex_t df[PART_LEN1];
+    float far_spectrum = 0.0f;
+    float near_spectrum = 0.0f;
+    float abs_far_spectrum[PART_LEN1];
+    float abs_near_spectrum[PART_LEN1];
+
+    const float gPow[2] = {0.9f, 0.1f};
+
+    // Noise estimate constants.
+    const int noiseInitBlocks = 500 * aec->mult;
+    const float step = 0.1f;
+    const float ramp = 1.0002f;
+    const float gInitNoise[2] = {0.999f, 0.001f};
+
+#ifdef WEBRTC_AEC_DEBUG_DUMP
+    fwrite(farend, sizeof(int16_t), PART_LEN, aec->farFile);
+    fwrite(nearend, sizeof(int16_t), PART_LEN, aec->nearFile);
+#endif
+
+    memset(dH, 0, sizeof(dH));
+
+    // ---------- Ooura fft ----------
+    // Concatenate old and new farend blocks.
+    for (i = 0; i < PART_LEN; i++) {
+        aec->xBuf[i + PART_LEN] = (float)farend[i];
+        d[i] = (float)nearend[i];
+    }
+
+    if (aec->sampFreq == 32000) {
+        for (i = 0; i < PART_LEN; i++) {
+            dH[i] = (float)nearendH[i];
+        }
+    }
+
+    memcpy(fft, aec->xBuf, sizeof(float) * PART_LEN2);
+    memcpy(aec->dBuf + PART_LEN, d, sizeof(float) * PART_LEN);
+    // For H band
+    if (aec->sampFreq == 32000) {
+        memcpy(aec->dBufH + PART_LEN, dH, sizeof(float) * PART_LEN);
+    }
+#ifdef FFT_NISH
+	memcpy(fft_re,fft,sizeof(float) * PART_LEN2);
+	memset(fft_im,0,sizeof(float) * PART_LEN2);
+	FFT(0,7,fft_re,fft_im);
+	xf[0][PART_LEN] = 0;
+	xf[1][PART_LEN] = 0;
+	for (i = 0; i < PART_LEN; i++) {
+        xf[0][i] = fft_re[i];
+        xf[1][i] = fft_im[i];
+    }
+
+#else
+    aec_rdft_forward_128(fft);
+
+	
+
+    // Far fft
+    xf[1][0] = 0;
+    xf[1][PART_LEN] = 0;
+    xf[0][0] = fft[0];
+    xf[0][PART_LEN] = 0;//fft[1];
+
+    for (i = 1; i < PART_LEN; i++) {
+        xf[0][i] = fft[2 * i];
+        xf[1][i] = fft[2 * i + 1];
+    }
+#endif
+
+    // Near fft
+    memcpy(fft, aec->dBuf, sizeof(float) * PART_LEN2);
+#ifdef FFT_NISH
+	memcpy(fft_re,fft,sizeof(float) * PART_LEN2);
+	memset(fft_im,0,sizeof(float) * PART_LEN2);
+	FFT(0,7,fft_re,fft_im);
+	df[PART_LEN][0]= 0;
+	df[PART_LEN][1] = 0;
+	for (i = 0; i < PART_LEN; i++) {
+        df[i][0] = fft_re[i];
+        df[i][1] = fft_im[i];
+    }
+
+#else
+    aec_rdft_forward_128(fft);
+    df[0][1] = 0;
+    df[PART_LEN][1] = 0;
+    df[0][0] = fft[0];
+    df[PART_LEN][0] = fft[1];
+
+    for (i = 1; i < PART_LEN; i++) {
+        df[i][0] = fft[2 * i];
+        df[i][1] = fft[2 * i + 1];
+    }
+#endif
+
+    // Power smoothing
+    for (i = 0; i < PART_LEN1; i++) {
+      far_spectrum = xf[0][i] * xf[0][i] + xf[1][i] * xf[1][i];
+      aec->xPow[i] = gPow[0] * aec->xPow[i] + gPow[1] * NR_PART * far_spectrum;
+      // Calculate absolute spectra
+      abs_far_spectrum[i] = sqrtf(far_spectrum);
+
+      near_spectrum = df[i][0] * df[i][0] + df[i][1] * df[i][1];
+      aec->dPow[i] = gPow[0] * aec->dPow[i] + gPow[1] * near_spectrum;
+      // Calculate absolute spectra
+      abs_near_spectrum[i] = sqrtf(near_spectrum);
+    }
+
+    // Estimate noise power. Wait until dPow is more stable.
+    if (aec->noiseEstCtr > 50) {
+        for (i = 0; i < PART_LEN1; i++) {
+            if (aec->dPow[i] < aec->dMinPow[i]) {
+                aec->dMinPow[i] = (aec->dPow[i] + step * (aec->dMinPow[i] -
+                    aec->dPow[i])) * ramp;
+            }
+            else {
+                aec->dMinPow[i] *= ramp;
+            }
+        }
+    }
+
+    // Smooth increasing noise power from zero at the start,
+    // to avoid a sudden burst of comfort noise.
+    if (aec->noiseEstCtr < noiseInitBlocks) {
+        aec->noiseEstCtr++;
+        for (i = 0; i < PART_LEN1; i++) {
+            if (aec->dMinPow[i] > aec->dInitMinPow[i]) {
+                aec->dInitMinPow[i] = gInitNoise[0] * aec->dInitMinPow[i] +
+                    gInitNoise[1] * aec->dMinPow[i];
+            }
+            else {
+                aec->dInitMinPow[i] = aec->dMinPow[i];
+            }
+        }
+        aec->noisePow = aec->dInitMinPow;
+    }
+    else {
+        aec->noisePow = aec->dMinPow;
+    }
+
+    // Block wise delay estimation used for logging
+    if (aec->delay_logging_enabled) {
+      int delay_estimate = 0;
+      // Estimate the delay
+      delay_estimate = WebRtc_DelayEstimatorProcessFloat(aec->delay_estimator,
+                                                         abs_far_spectrum,
+                                                         abs_near_spectrum,
+                                                         PART_LEN1,
+                                                         aec->echoState);
+      if (delay_estimate >= 0) {
+        // Update delay estimate buffer.
+        aec->delay_histogram[delay_estimate]++;
+      }
+    }
+
+    // Update the xfBuf block position.
+    aec->xfBufBlockPos--;
+    if (aec->xfBufBlockPos == -1) {
+        aec->xfBufBlockPos = NR_PART - 1;
+    }
+
+    // Buffer xf
+    memcpy(aec->xfBuf[0] + aec->xfBufBlockPos * PART_LEN1, xf[0],
+           sizeof(float) * PART_LEN1);
+    memcpy(aec->xfBuf[1] + aec->xfBufBlockPos * PART_LEN1, xf[1],
+           sizeof(float) * PART_LEN1);
+
+    memset(yf[0], 0, sizeof(float) * (PART_LEN1 * 2));
+
+    // Filter far
+    WebRtcAec_FilterFar(aec, yf);
+#ifdef FFT_NISH
+    // Inverse fft to obtain echo estimate and error.
+    //fft_re[0] = yf[0][0];
+	//fft_im[0] = 0;
+    //fft[1] = yf[0][PART_LEN];
+	memset(fft_re,0,sizeof(float) * PART_LEN2);
+	memset(fft_im,0,sizeof(float) * PART_LEN2);
+    for (i = 0; i < PART_LEN; i++) {
+        fft_re[i] = yf[0][i];
+        fft_im[i] = yf[1][i];
+    }
+	
+	FFT(1,7,fft_re,fft_im);
+	for (i = 0; i < PART_LEN; i++) 
+	{
+        y[i] = fft_re[PART_LEN + i];
+	}
+
+#else
+    // Inverse fft to obtain echo estimate and error.
+    fft[0] = yf[0][0];
+    fft[1] = yf[0][PART_LEN];
+    for (i = 1; i < PART_LEN; i++) {
+        fft[2 * i] = yf[0][i];
+        fft[2 * i + 1] = yf[1][i];
+    }
+    aec_rdft_inverse_128(fft);
+
+    scale = 2.0f / PART_LEN2;
+    for (i = 0; i < PART_LEN; i++) {
+        y[i] = fft[PART_LEN + i] * scale; // fft scaling
+    }
+#endif
+
+    for (i = 0; i < PART_LEN; i++) {
+        e[i] = d[i] - y[i];
+    }
+#ifdef FFT_NISH
+	 memcpy(aec->eBuf + PART_LEN, e, sizeof(float) * PART_LEN);
+	 memset(fft, 0, sizeof(float) * PART_LEN);
+     memcpy(fft + PART_LEN, e, sizeof(float) * PART_LEN);
+	 memcpy(fft_re,fft,sizeof(float) * PART_LEN2);
+	 memset(fft_im,0,sizeof(float) * PART_LEN2);
+
+	 FFT(0,7,fft_re,fft_im);
+	 ef[0][PART_LEN] = 0;
+	 ef[1][PART_LEN] = 0;
+	 for (i = 0; i < PART_LEN; i++) 
+	 {
+        ef[0][i] = fft_re[i];
+        ef[1][i] = fft_im[i];
+	 }
+	 ef[1][0] = 0;
+#else
+    // Error fft
+    memcpy(aec->eBuf + PART_LEN, e, sizeof(float) * PART_LEN);
+    memset(fft, 0, sizeof(float) * PART_LEN);
+    memcpy(fft + PART_LEN, e, sizeof(float) * PART_LEN);
+    aec_rdft_forward_128(fft);
+
+    ef[1][0] = 0;
+    ef[1][PART_LEN] = 0;
+    ef[0][0] = fft[0];
+    ef[0][PART_LEN] = fft[1];
+    for (i = 1; i < PART_LEN; i++) {
+        ef[0][i] = fft[2 * i];
+        ef[1][i] = fft[2 * i + 1];
+    }
+#endif
+
+    // Scale error signal inversely with far power.
+    WebRtcAec_ScaleErrorSignal(aec, ef);
+#if (DITECH_VERSION==1)
+    WebRtcAec_FilterAdaptation(aec, fft, ef);
+#else
+#if (DITECH_VERSION==2)
+	if(aec->adaptIsOff==0 && vadState>0)
+		WebRtcAec_FilterAdaptation(aec, fft, ef);
+#else
+#error DITECH_VERSION undefined
+#endif
+#endif
+
+
+    NonLinearProcessing(aec, output, outputH);
+
+    if (aec->metricsMode == 1) {
+        for (i = 0; i < PART_LEN; i++) {
+            eInt16[i] = (short)WEBRTC_SPL_SAT(WEBRTC_SPL_WORD16_MAX, e[i],
+                WEBRTC_SPL_WORD16_MIN);
+        }
+
+        // Update power levels and echo metrics
+        UpdateLevel(&aec->farlevel, farend);
+        UpdateLevel(&aec->nearlevel, nearend);
+        UpdateLevel(&aec->linoutlevel, eInt16);
+        UpdateLevel(&aec->nlpoutlevel, output);
+        UpdateMetrics(aec);
+    }
+
+#ifdef WEBRTC_AEC_DEBUG_DUMP
+    for (i = 0; i < PART_LEN; i++) {
+        eInt16[i] = (int16_t)WEBRTC_SPL_SAT(WEBRTC_SPL_WORD16_MAX, e[i],
+            WEBRTC_SPL_WORD16_MIN);
+    }
+
+    fwrite(eInt16, sizeof(int16_t), PART_LEN, aec->outLinearFile);
+    fwrite(output, sizeof(int16_t), PART_LEN, aec->outFile);
+#endif
+}
+#else
+#error DITECH_VERSION undefined
+#endif
+#endif
 
 static void NonLinearProcessing(aec_t *aec, short *output, short *outputH)
 {

@@ -12,7 +12,9 @@
 
 #ifndef WEBRTC_TYPEDEFS_H_
 #define WEBRTC_TYPEDEFS_H_
-#define DITECH_VERSION 2
+#define DITECH_VERSION 1
+#define TRUE 1
+#define FALSE 0
 // Reserved words definitions
 // TODO(andrew): Look at removing these.
 #define WEBRTC_EXTERN extern

@@ -12,7 +12,9 @@
  * Contains the API functions for the AEC.
  */
 #include "echo_cancellation.h"
-
+#include "anr_vad.h"
+#include "anr_const.h"
+#include"vad_process.h"
 #include <math.h>
 //#ifdef WEBRTC_AEC_DEBUG_DUMP
 #include <stdio.h>
@@ -93,6 +95,12 @@ typedef struct {
     int lastError;
 
     aec_t *aec;
+#if (DITECH_VERSION==2)
+	VAD_STATE_FLT vadState;
+	short vadFlag;
+	void *vadBuffer;
+	short vadCntr;
+#endif
 } aecpc_t;
 
 // Estimates delay to set the position of the farend buffer read pointer
@@ -126,6 +134,9 @@ WebRtc_Word32 WebRtcAec_Create(void **aecInst)
         aecpc = NULL;
         return -1;
     }
+#if (DITECH_VERSION==2)
+	WebRtcApm_CreateBuffer(&aecpc->vadBuffer,160);
+#endif
 
     if (WebRtcAec_CreateResampler(&aecpc->resampler) == -1) {
         WebRtcAec_Free(aecpc);
@@ -187,6 +198,9 @@ WebRtc_Word32 WebRtcAec_Free(void *aecInst)
 
     WebRtcAec_FreeAec(aecpc->aec);
     WebRtcApm_FreeBuffer(aecpc->farendBuf);
+#if (DITECH_VERSION==2)
+	WebRtcApm_FreeBuffer(aecpc->vadBuffer);
+#endif
     WebRtcAec_FreeResampler(aecpc->resampler);
     free(aecpc);
 
@@ -225,6 +239,13 @@ WebRtc_Word32 WebRtcAec_Init(void *aecInst, WebRtc_Word32 sampFreq, WebRtc_Word3
         aecpc->lastError = AEC_UNSPECIFIED_ERROR;
         return -1;
     }
+#if (DITECH_VERSION==2)
+	WebRtcApm_InitBuffer(aecpc->vadBuffer);
+	VAD_init_FLT(&aecpc->vadState);
+	VAD_cfg_standard_FLT(&aecpc->vadState);
+	aecpc->vadFlag=1;//noise
+	aecpc->vadCntr=0;
+#endif
 
     if (WebRtcAec_InitResampler(aecpc->resampler, aecpc->scSampFreq) == -1) {
         aecpc->lastError = AEC_UNSPECIFIED_ERROR;
@@ -551,9 +572,68 @@ WebRtc_Word32 WebRtcAec_Process(void *aecInst, const WebRtc_Word16 *nearend,
                 EstBufDelay(aecpc, aecpc->msInSndCardBuf);
             }
 
+#if (DITECH_VERSION==2)
+			{
+				if(aecpc->aec->mult==2)//16k rate
+				{
+					//resample to 8k
+					short j,nearend_resampled[FRAME_LEN/2];
+					for(j=0;j<FRAME_LEN/2;j++)
+					{
+						nearend_resampled[j]=nearend[FRAME_LEN * i+2*j];
+					}
+					
+					WebRtcApm_WriteBuffer(aecpc->vadBuffer, nearend_resampled, FRAME_LEN/2);
+				}
+				else
+				{
+					WebRtcApm_WriteBuffer(aecpc->vadBuffer, &nearend[FRAME_LEN * i], FRAME_LEN);
+				}
+				{
+
+					if(WebRtcApm_get_buffer_size(aecpc->vadBuffer)>=2* FRAME_LEN)
+					{
+						float in_data[2* FRAME_LEN],vad_buff[FFTLENGTH],fmag[FFTLENGTH],EdB[FFTLENGTH];
+						short in_data_short[2* FRAME_LEN],j;
+						WebRtcApm_ReadBuffer(aecpc->vadBuffer,in_data_short,2* FRAME_LEN);
+						for(j=0;j<2*FRAME_LEN;j++)
+						{
+							in_data[j]=in_data_short[j];
+						}
+						aecpc->vadFlag=VAD_process_FLT(&aecpc->vadState, in_data, vad_buff,fmag,EdB);
+						if(aecpc->vadFlag==1)//noise
+						{
+							if(aecpc->vadCntr>0)
+								aecpc->vadCntr--;
+						}
+						else
+						{
+							aecpc->vadCntr++;
+							if(aecpc->vadFlag==0)//transition
+								aecpc->vadCntr++;
+						}
+						if(aecpc->vadCntr>6)
+							aecpc->vadCntr=6;
+
+					}
+
+				}
+			}
+
+#endif
+#if (DITECH_VERSION==1)
             // Call the AEC
            WebRtcAec_ProcessFrame(aecpc->aec, farend, &nearend[FRAME_LEN * i], &nearendH[FRAME_LEN * i],
                &out[FRAME_LEN * i], &outH[FRAME_LEN * i], aecpc->knownDelay);
+#else
+#if (DITECH_VERSION==2)
+		  WebRtcAec_ProcessFrame(aecpc->aec, farend, &nearend[FRAME_LEN * i], &nearendH[FRAME_LEN * i],
+               &out[FRAME_LEN * i], &outH[FRAME_LEN * i], aecpc->knownDelay,aecpc->vadCntr);
+
+#else
+#error DITECH_VERSION undefined
+#endif
+#endif
         }
     }
 
