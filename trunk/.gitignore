@@ -2,7 +2,7 @@
 *.Makefile
 *.ncb
 *.ninja
-*.props
+#*.props
 *.pyc
 *.rules
 *.scons
