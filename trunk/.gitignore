@@ -11,8 +11,8 @@
 *.suo
 *.targets
 *.user
-*.vcproj
-*.vcxproj
+#*.vcproj
+#*.vcxproj
 *.vcxproj.filters
 *.vpj
 *.vpw
