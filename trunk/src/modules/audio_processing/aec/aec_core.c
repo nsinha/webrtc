@@ -116,8 +116,15 @@ static void ProcessBlock(aec_t *aec, const short *farend,
 
 static void BufferFar(aec_t *aec, const short *farend, int farLen);
 static void FetchFar(aec_t *aec, short *farend, int farLen, int knownDelay);
-
+#if (DITECH_VERSION==1)
 static void NonLinearProcessing(aec_t *aec, short *output, short *outputH);
+#else
+#if (DITECH_VERSION==2)
+static void NonLinearProcessing(aec_t *aec, short *output, short *outputH,short vadState);
+#else
+#error DITECH_VERSION undefined
+#endif
+#endif
 
 static void GetHighbandGain(const float *lambda, float *nlpGainHband);
 
@@ -397,16 +404,14 @@ static void FilterAdaptation(aec_t *aec, float *fft, float ef[2][PART_LEN1]) {
 #endif // UNCONSTR
   }
 
-#ifdef WEBRTC_AEC_DEBUG_DUMP
-	fwrite(aec->wfBuf[0], sizeof(float), NR_PART * PART_LEN1, aec->filterFile0);
-	//fwrite(aec->wfBuf[1], sizeof(float), NR_PART * PART_LEN1, aec->filterFile1);
-#endif
+
 }
 #else
 #error DITECH_VERSION undefined
 #endif
 #endif
 
+#if (DITECH_VERSION==1)
 static void OverdriveAndSuppress(aec_t *aec, float hNl[PART_LEN1],
                                  const float hNlFb,
                                  float efw[2][PART_LEN1]) {
@@ -422,12 +427,51 @@ static void OverdriveAndSuppress(aec_t *aec, float hNl[PART_LEN1],
     // Suppress error signal
     efw[0][i] *= hNl[i];
     efw[1][i] *= hNl[i];
+	
+
+
 
     // Ooura fft returns incorrect sign on imaginary component. It matters here
     // because we are making an additive change with comfort noise.
     efw[1][i] *= -1;
   }
 }
+#else
+#if (DITECH_VERSION==2)
+static void OverdriveAndSuppress(aec_t *aec, float hNl[PART_LEN1],
+                                 const float hNlFb,
+                                 float efw[2][PART_LEN1],short vadState) {
+  int i;
+  for (i = 0; i < PART_LEN1; i++) {
+    // Weight subbands
+    if (hNl[i] > hNlFb) {
+      hNl[i] = WebRtcAec_weightCurve[i] * hNlFb +
+          (1 - WebRtcAec_weightCurve[i]) * hNl[i];
+    }
+    hNl[i] = powf(hNl[i], aec->overDriveSm * WebRtcAec_overDriveCurve[i]);
+
+    // Suppress error signal
+    efw[0][i] *= hNl[i];
+    efw[1][i] *= hNl[i];
+	
+	if(vadState>=2)
+	{
+		float normalizer=sqrt(aec->sx[i]);
+		efw[0][i] /=normalizer;
+		efw[1][i] /=normalizer;
+	}
+
+
+
+    // Ooura fft returns incorrect sign on imaginary component. It matters here
+    // because we are making an additive change with comfort noise.
+    efw[1][i] *= -1;
+  }
+}
+#else
+#error DITECH_VERSION undefined
+#endif
+#endif
 
 WebRtcAec_FilterFar_t WebRtcAec_FilterFar;
 WebRtcAec_ScaleErrorSignal_t WebRtcAec_ScaleErrorSignal;
@@ -1290,13 +1334,17 @@ static void ProcessBlock(aec_t *aec, const short *farend,
 #if (DITECH_VERSION==2)
 	if(aec->adaptIsOff==0 && vadState>0)
 		WebRtcAec_FilterAdaptation(aec, fft, ef);
+#ifdef WEBRTC_AEC_DEBUG_DUMP
+	fwrite(aec->wfBuf[0], sizeof(float), NR_PART * PART_LEN1, aec->filterFile0);
+	//fwrite(aec->wfBuf[1], sizeof(float), NR_PART * PART_LEN1, aec->filterFile1);
+#endif
 #else
 #error DITECH_VERSION undefined
 #endif
 #endif
 
 
-    NonLinearProcessing(aec, output, outputH);
+    NonLinearProcessing(aec, output, outputH,vadState);
 
     if (aec->metricsMode == 1) {
         for (i = 0; i < PART_LEN; i++) {
@@ -1326,7 +1374,7 @@ static void ProcessBlock(aec_t *aec, const short *farend,
 #error DITECH_VERSION undefined
 #endif
 #endif
-
+#if (DITECH_VERSION==1)
 static void NonLinearProcessing(aec_t *aec, short *output, short *outputH)
 {
     float efw[2][PART_LEN1], dfw[2][PART_LEN1];
@@ -1468,6 +1516,8 @@ static void NonLinearProcessing(aec_t *aec, short *output, short *outputH)
         sdSum += aec->sd[i];
         seSum += aec->se[i];
     }
+	
+	
 
     // Divergent filter safeguard.
     if (aec->divergeState == 0) {
@@ -1590,7 +1640,9 @@ static void NonLinearProcessing(aec_t *aec, short *output, short *outputH)
       aec->overDriveSm = 0.9f * aec->overDriveSm + 0.1f * aec->overDrive;
     }
 
-    WebRtcAec_OverdriveAndSuppress(aec, hNl, hNlFb, efw);
+
+	WebRtcAec_OverdriveAndSuppress(aec, hNl, hNlFb, efw);
+
 
     // Add comfort noise.
     ComfortNoise(aec, efw, comfortNoiseHband, aec->noisePow, hNl);
@@ -1669,6 +1721,365 @@ static void NonLinearProcessing(aec_t *aec, short *output, short *outputH)
     memmove(aec->xfwBuf + PART_LEN1, aec->xfwBuf, sizeof(aec->xfwBuf) -
         sizeof(complex_t) * PART_LEN1);
 }
+#else 
+#if (DITECH_VERSION==2)
+static void NonLinearProcessing(aec_t *aec, short *output, short *outputH,short vadState)
+{
+    float efw[2][PART_LEN1], dfw[2][PART_LEN1];
+    complex_t xfw[PART_LEN1];
+    complex_t comfortNoiseHband[PART_LEN1];
+    float fft[PART_LEN2];
+    float scale, dtmp;
+    float nlpGainHband;
+    int i, j, pos;
+
+    // Coherence and non-linear filter
+    float cohde[PART_LEN1], cohxd[PART_LEN1];
+    float hNlDeAvg, hNlXdAvg;
+    float hNl[PART_LEN1];
+    float hNlPref[PREF_BAND_SIZE];
+    float hNlFb = 0, hNlFbLow = 0;
+    const float prefBandQuant = 0.75f, prefBandQuantLow = 0.5f;
+    const int prefBandSize = PREF_BAND_SIZE / aec->mult;
+    const int minPrefBand = 4 / aec->mult;
+
+    // Near and error power sums
+    float sdSum = 0, seSum = 0;
+
+    // Power estimate smoothing coefficients
+    const float gCoh[2][2] = {{0.9f, 0.1f}, {0.93f, 0.07f}};
+    const float *ptrGCoh = gCoh[aec->mult - 1];
+
+    // Filter energey
+    float wfEnMax = 0, wfEn = 0;
+    const int delayEstInterval = 10 * aec->mult;
+
+    aec->delayEstCtr++;
+    if (aec->delayEstCtr == delayEstInterval) {
+        aec->delayEstCtr = 0;
+    }
+
+    // initialize comfort noise for H band
+    memset(comfortNoiseHband, 0, sizeof(comfortNoiseHband));
+    nlpGainHband = (float)0.0;
+    dtmp = (float)0.0;
+
+    // Measure energy in each filter partition to determine delay.
+    // TODO: Spread by computing one partition per block?
+    if (aec->delayEstCtr == 0) {
+        wfEnMax = 0;
+        aec->delayIdx = 0;
+        for (i = 0; i < NR_PART; i++) {
+            pos = i * PART_LEN1;
+            wfEn = 0;
+            for (j = 0; j < PART_LEN1; j++) {
+                wfEn += aec->wfBuf[0][pos + j] * aec->wfBuf[0][pos + j] +
+                    aec->wfBuf[1][pos + j] * aec->wfBuf[1][pos + j];
+            }
+
+            if (wfEn > wfEnMax) {
+                wfEnMax = wfEn;
+                aec->delayIdx = i;
+            }
+        }
+    }
+
+    // NLP
+    // Windowed far fft
+    for (i = 0; i < PART_LEN; i++) {
+        fft[i] = aec->xBuf[i] * sqrtHanning[i];
+        fft[PART_LEN + i] = aec->xBuf[PART_LEN + i] * sqrtHanning[PART_LEN - i];
+    }
+    aec_rdft_forward_128(fft);
+
+    xfw[0][1] = 0;
+    xfw[PART_LEN][1] = 0;
+    xfw[0][0] = fft[0];
+    xfw[PART_LEN][0] = fft[1];
+    for (i = 1; i < PART_LEN; i++) {
+        xfw[i][0] = fft[2 * i];
+        xfw[i][1] = fft[2 * i + 1];
+    }
+
+    // Buffer far.
+    memcpy(aec->xfwBuf, xfw, sizeof(xfw));
+
+    // Use delayed far.
+    memcpy(xfw, aec->xfwBuf + aec->delayIdx * PART_LEN1, sizeof(xfw));
+
+    // Windowed near fft
+    for (i = 0; i < PART_LEN; i++) {
+        fft[i] = aec->dBuf[i] * sqrtHanning[i];
+        fft[PART_LEN + i] = aec->dBuf[PART_LEN + i] * sqrtHanning[PART_LEN - i];
+    }
+    aec_rdft_forward_128(fft);
+
+    dfw[1][0] = 0;
+    dfw[1][PART_LEN] = 0;
+    dfw[0][0] = fft[0];
+    dfw[0][PART_LEN] = fft[1];
+    for (i = 1; i < PART_LEN; i++) {
+        dfw[0][i] = fft[2 * i];
+        dfw[1][i] = fft[2 * i + 1];
+    }
+
+    // Windowed error fft
+    for (i = 0; i < PART_LEN; i++) {
+        fft[i] = aec->eBuf[i] * sqrtHanning[i];
+        fft[PART_LEN + i] = aec->eBuf[PART_LEN + i] * sqrtHanning[PART_LEN - i];
+    }
+    aec_rdft_forward_128(fft);
+    efw[1][0] = 0;
+    efw[1][PART_LEN] = 0;
+    efw[0][0] = fft[0];
+    efw[0][PART_LEN] = fft[1];
+    for (i = 1; i < PART_LEN; i++) {
+        efw[0][i] = fft[2 * i];
+        efw[1][i] = fft[2 * i + 1];
+    }
+
+    // Smoothed PSD
+    for (i = 0; i < PART_LEN1; i++) {
+        aec->sd[i] = ptrGCoh[0] * aec->sd[i] + ptrGCoh[1] *
+            (dfw[0][i] * dfw[0][i] + dfw[1][i] * dfw[1][i]);
+        aec->se[i] = ptrGCoh[0] * aec->se[i] + ptrGCoh[1] *
+            (efw[0][i] * efw[0][i] + efw[1][i] * efw[1][i]);
+        // We threshold here to protect against the ill-effects of a zero farend.
+        // The threshold is not arbitrarily chosen, but balances protection and
+        // adverse interaction with the algorithm's tuning.
+        // TODO: investigate further why this is so sensitive.
+        aec->sx[i] = ptrGCoh[0] * aec->sx[i] + ptrGCoh[1] *
+            WEBRTC_SPL_MAX(xfw[i][0] * xfw[i][0] + xfw[i][1] * xfw[i][1], 15);
+
+        aec->sde[i][0] = ptrGCoh[0] * aec->sde[i][0] + ptrGCoh[1] *
+            (dfw[0][i] * efw[0][i] + dfw[1][i] * efw[1][i]);
+        aec->sde[i][1] = ptrGCoh[0] * aec->sde[i][1] + ptrGCoh[1] *
+            (dfw[0][i] * efw[1][i] - dfw[1][i] * efw[0][i]);
+
+        aec->sxd[i][0] = ptrGCoh[0] * aec->sxd[i][0] + ptrGCoh[1] *
+            (dfw[0][i] * xfw[i][0] + dfw[1][i] * xfw[i][1]);
+        aec->sxd[i][1] = ptrGCoh[0] * aec->sxd[i][1] + ptrGCoh[1] *
+            (dfw[0][i] * xfw[i][1] - dfw[1][i] * xfw[i][0]);
+
+        sdSum += aec->sd[i];
+        seSum += aec->se[i];
+    }
+	
+	
+
+    // Divergent filter safeguard.
+    if (aec->divergeState == 0) {
+        if (seSum > sdSum) {
+            aec->divergeState = 1;
+        }
+    }
+    else {
+        if (seSum * 1.05f < sdSum) {
+            aec->divergeState = 0;
+        }
+    }
+
+    if (aec->divergeState == 1) {
+        memcpy(efw, dfw, sizeof(efw));
+    }
+
+    // Reset if error is significantly larger than nearend (13 dB).
+    if (seSum > (19.95f * sdSum)) {
+        memset(aec->wfBuf, 0, sizeof(aec->wfBuf));
+    }
+
+    // Subband coherence
+    for (i = 0; i < PART_LEN1; i++) {
+        cohde[i] = (aec->sde[i][0] * aec->sde[i][0] + aec->sde[i][1] * aec->sde[i][1]) /
+            (aec->sd[i] * aec->se[i] + 1e-10f);
+        cohxd[i] = (aec->sxd[i][0] * aec->sxd[i][0] + aec->sxd[i][1] * aec->sxd[i][1]) /
+            (aec->sx[i] * aec->sd[i] + 1e-10f);
+    }
+
+    hNlXdAvg = 0;
+    for (i = minPrefBand; i < prefBandSize + minPrefBand; i++) {
+        hNlXdAvg += cohxd[i];
+    }
+    hNlXdAvg /= prefBandSize;
+    hNlXdAvg = 1 - hNlXdAvg;
+
+    hNlDeAvg = 0;
+    for (i = minPrefBand; i < prefBandSize + minPrefBand; i++) {
+        hNlDeAvg += cohde[i];
+    }
+    hNlDeAvg /= prefBandSize;
+
+    if (hNlXdAvg < 0.75f && hNlXdAvg < aec->hNlXdAvgMin) {
+        aec->hNlXdAvgMin = hNlXdAvg;
+    }
+
+    if (hNlDeAvg > 0.98f && hNlXdAvg > 0.9f) {
+        aec->stNearState = 1;
+    }
+    else if (hNlDeAvg < 0.95f || hNlXdAvg < 0.8f) {
+        aec->stNearState = 0;
+    }
+
+    if (aec->hNlXdAvgMin == 1) {
+        aec->echoState = 0;
+        aec->overDrive = aec->minOverDrive;
+
+        if (aec->stNearState == 1) {
+            memcpy(hNl, cohde, sizeof(hNl));
+            hNlFb = hNlDeAvg;
+            hNlFbLow = hNlDeAvg;
+        }
+        else {
+            for (i = 0; i < PART_LEN1; i++) {
+                hNl[i] = 1 - cohxd[i];
+            }
+            hNlFb = hNlXdAvg;
+            hNlFbLow = hNlXdAvg;
+        }
+    }
+    else {
+
+        if (aec->stNearState == 1) {
+            aec->echoState = 0;
+            memcpy(hNl, cohde, sizeof(hNl));
+            hNlFb = hNlDeAvg;
+            hNlFbLow = hNlDeAvg;
+        }
+        else {
+            aec->echoState = 1;
+            for (i = 0; i < PART_LEN1; i++) {
+                hNl[i] = WEBRTC_SPL_MIN(cohde[i], 1 - cohxd[i]);
+            }
+
+            // Select an order statistic from the preferred bands.
+            // TODO: Using quicksort now, but a selection algorithm may be preferred.
+            memcpy(hNlPref, &hNl[minPrefBand], sizeof(float) * prefBandSize);
+            qsort(hNlPref, prefBandSize, sizeof(float), CmpFloat);
+            hNlFb = hNlPref[(int)floor(prefBandQuant * (prefBandSize - 1))];
+            hNlFbLow = hNlPref[(int)floor(prefBandQuantLow * (prefBandSize - 1))];
+        }
+    }
+
+    // Track the local filter minimum to determine suppression overdrive.
+    if (hNlFbLow < 0.6f && hNlFbLow < aec->hNlFbLocalMin) {
+        aec->hNlFbLocalMin = hNlFbLow;
+        aec->hNlFbMin = hNlFbLow;
+        aec->hNlNewMin = 1;
+        aec->hNlMinCtr = 0;
+    }
+    aec->hNlFbLocalMin = WEBRTC_SPL_MIN(aec->hNlFbLocalMin + 0.0008f / aec->mult, 1);
+    aec->hNlXdAvgMin = WEBRTC_SPL_MIN(aec->hNlXdAvgMin + 0.0006f / aec->mult, 1);
+
+    if (aec->hNlNewMin == 1) {
+        aec->hNlMinCtr++;
+    }
+    if (aec->hNlMinCtr == 2) {
+        aec->hNlNewMin = 0;
+        aec->hNlMinCtr = 0;
+        aec->overDrive = WEBRTC_SPL_MAX(aec->targetSupp /
+            ((float)log(aec->hNlFbMin + 1e-10f) + 1e-10f), aec->minOverDrive);
+    }
+
+    // Smooth the overdrive.
+    if (aec->overDrive < aec->overDriveSm) {
+      aec->overDriveSm = 0.99f * aec->overDriveSm + 0.01f * aec->overDrive;
+    }
+    else {
+      aec->overDriveSm = 0.9f * aec->overDriveSm + 0.1f * aec->overDrive;
+    }
+
+#if (DITECH_VERSION==1)
+
+	WebRtcAec_OverdriveAndSuppress(aec, hNl, hNlFb, efw,);
+#else
+#if (DITECH_VERSION==2)
+	OverdriveAndSuppress(aec, hNl, hNlFb, efw,vadState);
+#else
+#error DITECH_VERSION undefined
+#endif
+#endif
+
+    // Add comfort noise.
+    ComfortNoise(aec, efw, comfortNoiseHband, aec->noisePow, hNl);
+
+    // Inverse error fft.
+    fft[0] = efw[0][0];
+    fft[1] = efw[0][PART_LEN];
+    for (i = 1; i < PART_LEN; i++) {
+        fft[2*i] = efw[0][i];
+        // Sign change required by Ooura fft.
+        fft[2*i + 1] = -efw[1][i];
+    }
+    aec_rdft_inverse_128(fft);
+
+    // Overlap and add to obtain output.
+    scale = 2.0f / PART_LEN2;
+    for (i = 0; i < PART_LEN; i++) {
+        fft[i] *= scale; // fft scaling
+        fft[i] = fft[i]*sqrtHanning[i] + aec->outBuf[i];
+
+        // Saturation protection
+        output[i] = (short)WEBRTC_SPL_SAT(WEBRTC_SPL_WORD16_MAX, fft[i],
+            WEBRTC_SPL_WORD16_MIN);
+
+        fft[PART_LEN + i] *= scale; // fft scaling
+        aec->outBuf[i] = fft[PART_LEN + i] * sqrtHanning[PART_LEN - i];
+    }
+
+    // For H band
+    if (aec->sampFreq == 32000) {
+
+        // H band gain
+        // average nlp over low band: average over second half of freq spectrum
+        // (4->8khz)
+        GetHighbandGain(hNl, &nlpGainHband);
+
+        // Inverse comfort_noise
+        if (flagHbandCn == 1) {
+            fft[0] = comfortNoiseHband[0][0];
+            fft[1] = comfortNoiseHband[PART_LEN][0];
+            for (i = 1; i < PART_LEN; i++) {
+                fft[2*i] = comfortNoiseHband[i][0];
+                fft[2*i + 1] = comfortNoiseHband[i][1];
+            }
+            aec_rdft_inverse_128(fft);
+            scale = 2.0f / PART_LEN2;
+        }
+
+        // compute gain factor
+        for (i = 0; i < PART_LEN; i++) {
+            dtmp = (float)aec->dBufH[i];
+            dtmp = (float)dtmp * nlpGainHband; // for variable gain
+
+            // add some comfort noise where Hband is attenuated
+            if (flagHbandCn == 1) {
+                fft[i] *= scale; // fft scaling
+                dtmp += cnScaleHband * fft[i];
+            }
+
+            // Saturation protection
+            outputH[i] = (short)WEBRTC_SPL_SAT(WEBRTC_SPL_WORD16_MAX, dtmp,
+                WEBRTC_SPL_WORD16_MIN);
+         }
+    }
+
+    // Copy the current block to the old position.
+    memcpy(aec->xBuf, aec->xBuf + PART_LEN, sizeof(float) * PART_LEN);
+    memcpy(aec->dBuf, aec->dBuf + PART_LEN, sizeof(float) * PART_LEN);
+    memcpy(aec->eBuf, aec->eBuf + PART_LEN, sizeof(float) * PART_LEN);
+
+    // Copy the current block to the old position for H band
+    if (aec->sampFreq == 32000) {
+        memcpy(aec->dBufH, aec->dBufH + PART_LEN, sizeof(float) * PART_LEN);
+    }
+
+    memmove(aec->xfwBuf + PART_LEN1, aec->xfwBuf, sizeof(aec->xfwBuf) -
+        sizeof(complex_t) * PART_LEN1);
+}
+#else
+#error DITECH_VERSION undefined
+#endif
+#endif
 
 static void GetHighbandGain(const float *lambda, float *nlpGainHband)
 {

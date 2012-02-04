@@ -81,6 +81,8 @@ typedef struct {
     FILE *bufFile;
     FILE *delayFile;
     FILE *skewFile;
+	FILE * ffar;
+	FILE *fnear;
 #endif
 
     // Structures
@@ -168,7 +170,9 @@ WebRtc_Word32 WebRtcAec_Create(void **aecInst)
       aecpc->aec->filterFile0 = fopen(filename, "wb");
 	  sprintf(filename, "aec_filter1%d.pcm", instance_count);
       aecpc->aec->filterFile1 = fopen(filename, "wb");
-	  
+	  aecpc->ffar=fopen("raec_far0.pcm","rb");
+	  aecpc->fnear=fopen("raec_near0.pcm","rb");
+  
       instance_count++;
     }
 #endif
@@ -574,20 +578,29 @@ WebRtc_Word32 WebRtcAec_Process(void *aecInst, const WebRtc_Word16 *nearend,
 
 #if (DITECH_VERSION==2)
 			{
-				if(aecpc->aec->mult==2)//16k rate
+#ifdef WEBRTC_AEC_DEBUG_DUMP
+				/*{
+					if(aecpc->ffar)
+						fread(farend, 2, FRAME_LEN, aecpc->ffar);
+					if(aecpc->fnear)
+						fread((void *)&nearend[FRAME_LEN * i], 2, FRAME_LEN, aecpc->fnear);
+
+				}*/
+#endif
+				if(aecpc->sampFreq!=8000)//16k rate
 				{
 					//resample to 8k
 					short j,nearend_resampled[FRAME_LEN/2];
 					for(j=0;j<FRAME_LEN/2;j++)
 					{
-						nearend_resampled[j]=nearend[FRAME_LEN * i+2*j];
+						nearend_resampled[j]=farend[2*j];//nearend[FRAME_LEN * i+2*j];
 					}
 					
 					WebRtcApm_WriteBuffer(aecpc->vadBuffer, nearend_resampled, FRAME_LEN/2);
 				}
 				else
 				{
-					WebRtcApm_WriteBuffer(aecpc->vadBuffer, &nearend[FRAME_LEN * i], FRAME_LEN);
+					WebRtcApm_WriteBuffer(aecpc->vadBuffer, farend/*&nearend[FRAME_LEN * i]*/, FRAME_LEN);
 				}
 				{
 
@@ -627,6 +640,8 @@ WebRtc_Word32 WebRtcAec_Process(void *aecInst, const WebRtc_Word16 *nearend,
                &out[FRAME_LEN * i], &outH[FRAME_LEN * i], aecpc->knownDelay);
 #else
 #if (DITECH_VERSION==2)
+			
+
 		  WebRtcAec_ProcessFrame(aecpc->aec, farend, &nearend[FRAME_LEN * i], &nearendH[FRAME_LEN * i],
                &out[FRAME_LEN * i], &outH[FRAME_LEN * i], aecpc->knownDelay,aecpc->vadCntr);
 
