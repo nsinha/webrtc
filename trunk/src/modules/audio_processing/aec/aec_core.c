@@ -11,7 +11,7 @@
 /*
  * The core AEC algorithm, which is presented with time-aligned signals.
  */
-#define FFT_NISH
+//#define FFT_NISH
 short FFT(short int dir,int m,float *x,float *y);
 #include "aec_core.h"
 
@@ -206,6 +206,8 @@ int WebRtcAec_CreateAec(aec_t **aecInst)
 
     return 0;
 }
+
+
 
 int WebRtcAec_FreeAec(aec_t *aec)
 {

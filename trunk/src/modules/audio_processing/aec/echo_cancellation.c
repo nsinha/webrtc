@@ -102,12 +102,23 @@ typedef struct {
 	short vadFlag;
 	void *vadBuffer;
 	short vadCntr;
+	VAD_STATE_FLT vadState_nearEnd;
+	short vadFlag_nearEnd;
+	void *vadBuffer_nearEnd;
+
+	short vad_farend_history[50];//1sec on 8khz and 20ms frames
+	short vad_delay_corr[50];
+	statistical_aec_t *stats_aec;
 #endif
 } aecpc_t;
 
 // Estimates delay to set the position of the farend buffer read pointer
 // (controlled by knownDelay)
 static int EstBufDelay(aecpc_t *aecInst, short msInSndCardBuf);
+
+#if (DITECH_VERSION==2)
+void estimate_delay_on_vad_corr(aecpc_t *aecpc);
+#endif
 
 // Stuffs the farend buffer if the estimated delay is too large
 static int DelayComp(aecpc_t *aecInst);
@@ -130,7 +141,13 @@ WebRtc_Word32 WebRtcAec_Create(void **aecInst)
         aecpc = NULL;
         return -1;
     }
-
+#if (DITECH_VERSION==2) 
+	if (WebRtcAec_CreateAecStatistical(&aecpc->stats_aec) == -1) {
+        WebRtcAec_Free(aecpc);
+        aecpc = NULL;
+        return -1;
+    }
+#endif
     if (WebRtcApm_CreateBuffer(&aecpc->farendBuf, bufSizeSamp) == -1) {
         WebRtcAec_Free(aecpc);
         aecpc = NULL;
@@ -138,6 +155,9 @@ WebRtc_Word32 WebRtcAec_Create(void **aecInst)
     }
 #if (DITECH_VERSION==2)
 	WebRtcApm_CreateBuffer(&aecpc->vadBuffer,160);
+	WebRtcApm_CreateBuffer(&aecpc->vadBuffer_nearEnd,160);
+	memset(&aecpc->vad_farend_history,0,50*sizeof(short));
+	memset(&aecpc->vad_delay_corr,0,50*sizeof(short));
 #endif
 
     if (WebRtcAec_CreateResampler(&aecpc->resampler) == -1) {
@@ -203,7 +223,9 @@ WebRtc_Word32 WebRtcAec_Free(void *aecInst)
     WebRtcAec_FreeAec(aecpc->aec);
     WebRtcApm_FreeBuffer(aecpc->farendBuf);
 #if (DITECH_VERSION==2)
+	WebRtcAec_FreeAecStatistical(aecpc->stats_aec);
 	WebRtcApm_FreeBuffer(aecpc->vadBuffer);
+	WebRtcApm_FreeBuffer(aecpc->vadBuffer_nearEnd);
 #endif
     WebRtcAec_FreeResampler(aecpc->resampler);
     free(aecpc);
@@ -249,6 +271,11 @@ WebRtc_Word32 WebRtcAec_Init(void *aecInst, WebRtc_Word32 sampFreq, WebRtc_Word3
 	VAD_cfg_standard_FLT(&aecpc->vadState);
 	aecpc->vadFlag=1;//noise
 	aecpc->vadCntr=0;
+
+	WebRtcApm_InitBuffer(aecpc->vadBuffer_nearEnd);
+	VAD_init_FLT(&aecpc->vadState_nearEnd);
+	VAD_cfg_standard_FLT(&aecpc->vadState_nearEnd);
+	aecpc->vadFlag_nearEnd=1;//noise
 #endif
 
     if (WebRtcAec_InitResampler(aecpc->resampler, aecpc->scSampFreq) == -1) {
@@ -473,7 +500,7 @@ WebRtc_Word32 WebRtcAec_Process(void *aecInst, const WebRtc_Word16 *nearend,
             }
 
 #ifdef WEBRTC_AEC_DEBUG_DUMP
-            fwrite(&aecpc->skew, sizeof(aecpc->skew), 1, aecpc->skewFile);
+            //fwrite(&aecpc->skew, sizeof(aecpc->skew), 1, aecpc->skewFile);
 #endif
         }
     }
@@ -578,30 +605,34 @@ WebRtc_Word32 WebRtcAec_Process(void *aecInst, const WebRtc_Word16 *nearend,
 
 #if (DITECH_VERSION==2)
 			{
-#ifdef WEBRTC_AEC_DEBUG_DUMP
-				/*{
+#ifdef WEBRTC_AEC_DEBUG_DUMP1
+				{
 					if(aecpc->ffar)
 						fread(farend, 2, FRAME_LEN, aecpc->ffar);
 					if(aecpc->fnear)
 						fread((void *)&nearend[FRAME_LEN * i], 2, FRAME_LEN, aecpc->fnear);
 
-				}*/
+				}
 #endif
 				if(aecpc->sampFreq!=8000)//16k rate
 				{
 					//resample to 8k
-					short j,nearend_resampled[FRAME_LEN/2];
+					short j,farend_resampled[FRAME_LEN/2],neaEnd_reSampled[FRAME_LEN/2];
 					for(j=0;j<FRAME_LEN/2;j++)
 					{
-						nearend_resampled[j]=farend[2*j];//nearend[FRAME_LEN * i+2*j];
+						farend_resampled[j]=farend[2*j];
+						neaEnd_reSampled[j]=nearend[FRAME_LEN * i+2*j];
 					}
 					
-					WebRtcApm_WriteBuffer(aecpc->vadBuffer, nearend_resampled, FRAME_LEN/2);
+					WebRtcApm_WriteBuffer(aecpc->vadBuffer, farend_resampled, FRAME_LEN/2);
+					WebRtcApm_WriteBuffer(aecpc->vadBuffer_nearEnd, farend_resampled, FRAME_LEN/2);
 				}
 				else
 				{
-					WebRtcApm_WriteBuffer(aecpc->vadBuffer, farend/*&nearend[FRAME_LEN * i]*/, FRAME_LEN);
+					WebRtcApm_WriteBuffer(aecpc->vadBuffer, farend, FRAME_LEN);
+					WebRtcApm_WriteBuffer(aecpc->vadBuffer_nearEnd,&nearend[FRAME_LEN * i], FRAME_LEN);
 				}
+				//do vad on near and far end
 				{
 
 					if(WebRtcApm_get_buffer_size(aecpc->vadBuffer)>=2* FRAME_LEN)
@@ -614,6 +645,15 @@ WebRtc_Word32 WebRtcAec_Process(void *aecInst, const WebRtc_Word16 *nearend,
 							in_data[j]=in_data_short[j];
 						}
 						aecpc->vadFlag=VAD_process_FLT(&aecpc->vadState, in_data, vad_buff,fmag,EdB);
+
+						/*store this decision to vad_farend_history*/
+						for(j=50;j>0;j--)
+						{
+							aecpc->vad_farend_history[j]=aecpc->vad_farend_history[j-1];
+						}
+						aecpc->vad_farend_history[0]=aecpc->vadFlag;
+
+
 						if(aecpc->vadFlag==1)//noise
 						{
 							if(aecpc->vadCntr>0)
@@ -629,6 +669,19 @@ WebRtc_Word32 WebRtcAec_Process(void *aecInst, const WebRtc_Word16 *nearend,
 							aecpc->vadCntr=6;
 
 					}
+					if(WebRtcApm_get_buffer_size(aecpc->vadBuffer_nearEnd)>=2* FRAME_LEN)
+					{
+						float in_data[2* FRAME_LEN],vad_buff[FFTLENGTH],fmag[FFTLENGTH],EdB[FFTLENGTH];
+						short in_data_short[2* FRAME_LEN],j;
+						WebRtcApm_ReadBuffer(aecpc->vadBuffer_nearEnd,in_data_short,2* FRAME_LEN);
+						for(j=0;j<2*FRAME_LEN;j++)
+						{
+							in_data[j]=in_data_short[j];
+						}
+						aecpc->vadFlag_nearEnd=VAD_process_FLT(&aecpc->vadState_nearEnd, in_data, vad_buff,fmag,EdB);
+					}
+
+					estimate_delay_on_vad_corr(aecpc);
 
 				}
 			}
@@ -641,9 +694,16 @@ WebRtc_Word32 WebRtcAec_Process(void *aecInst, const WebRtc_Word16 *nearend,
 #else
 #if (DITECH_VERSION==2)
 			
+		  //aecpc->knownDelay=720;
+		  WebRtcAec_ProcessFrame_Statistical(aecpc->stats_aec, farend, &nearend[FRAME_LEN * i],aecpc->aec);
+		  if(aecpc->stats_aec->processed_known_delay>=0)
+		  {
+			  aecpc->knownDelay=(aecpc->stats_aec->processed_known_delay*8);
+		  }
 
 		  WebRtcAec_ProcessFrame(aecpc->aec, farend, &nearend[FRAME_LEN * i], &nearendH[FRAME_LEN * i],
                &out[FRAME_LEN * i], &outH[FRAME_LEN * i], aecpc->knownDelay,aecpc->vadCntr);
+		  
 
 #else
 #error DITECH_VERSION undefined
@@ -1080,3 +1140,44 @@ static int DelayComp(aecpc_t *aecpc)
 
     return 0;
 }
+
+
+#if (DITECH_VERSION==2)
+
+void estimate_delay_on_vad_corr(aecpc_t *aecpc)
+{
+	int j,max;
+	max=0;
+	if(aecpc->vadFlag_nearEnd==0)
+	{
+			for (j=0;j<50;j++)
+			{
+				if(aecpc->vad_farend_history[j]==0)
+				{
+
+					aecpc->vad_delay_corr[j]++;
+					if(max<aecpc->vad_delay_corr[j])
+						max=aecpc->vad_delay_corr[j];
+				}
+			}
+
+			if(max>50)
+			{
+				for (j=0;j<50;j++)
+				{
+					aecpc->vad_delay_corr[j]-=25;
+					if(aecpc->vad_delay_corr[j]<0)
+						aecpc->vad_delay_corr[j]=0;
+
+				}
+			}
+#ifdef WEBRTC_AEC_DEBUG_DUMP
+            //fwrite(&aecpc->vad_delay_corr, sizeof(short), 50, aecpc->aec->filterFile1);
+#endif
+
+			
+	}
+
+}
+
+#endif

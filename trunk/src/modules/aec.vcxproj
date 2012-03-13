@@ -265,6 +265,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="audio_processing\aec\aec_core.c" />
+    <ClCompile Include="audio_processing\aec\aec_core_1.c" />
     <ClCompile Include="audio_processing\aec\aec_resampler.c" />
     <ClCompile Include="audio_processing\aec\anr_tab.c" />
     <ClCompile Include="audio_processing\aec\dsp_func.c" />

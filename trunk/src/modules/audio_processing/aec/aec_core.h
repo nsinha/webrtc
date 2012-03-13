@@ -164,6 +164,85 @@ typedef struct {
 #endif
 } aec_t;
 
+
+#if (DITECH_VERSION==2)
+//all data in terms of 16k
+#define DNS_RATE 8
+#define HUNDRED_MS_IN_16K_DNS 200
+#define DNS_FRAME_LEN FRAME_LEN/DNS_RATE
+typedef struct {
+    int farBufWritePos, farBufReadPos;
+
+
+	int adaptIsOff;//nsinha this variable will control if adaptation of filter needs to de done.is turned off on discontinuity of time gap while calling.		
+    int inSamples, outSamples;
+    int delayEstCtr;
+
+    void *farFrBuf, *nearFrBuf, *outFrBuf;
+
+
+    float xBuf[PART_LEN2]; // farend
+    float dBuf[PART_LEN2]; // nearend
+    float eBuf[PART_LEN2]; // error
+
+    float dBufH[PART_LEN2]; // nearend
+
+    float xPow[PART_LEN1];
+    float dPow[PART_LEN1];
+    float dMinPow[PART_LEN1];
+    float dInitMinPow[PART_LEN1];
+    float *noisePow;
+
+    float xfBuf[2][NR_PART * PART_LEN1]; // farend fft buffer
+    float wfBuf[2][NR_PART * PART_LEN1]; // filter fft
+ 
+    float outBuf[PART_LEN];
+    int delayIdx;
+
+    short stNearState, echoState;
+    short divergeState;
+
+    int xfBufBlockPos;
+
+    float farBuf[HUNDRED_MS_IN_16K_DNS+DNS_FRAME_LEN];
+	float instantaneous_cor_buff[HUNDRED_MS_IN_16K_DNS];
+	float long_term_cor_buff[HUNDRED_MS_IN_16K_DNS];
+	float long_term_corr_buff_along_states[HUNDRED_MS_IN_16K_DNS];
+	float long_term_corr_buff_stats_cntr[HUNDRED_MS_IN_16K_DNS];
+	int known_delay;
+	int known_delay_less_confidence;
+	int processed_known_delay;
+
+    short mult; // sampling frequency multiple
+    int sampFreq;
+    WebRtc_UWord32 seed;
+
+    float mu; // stepsize
+    float errThresh; // error threshold
+
+    int noiseEstCtr;
+
+    power_level_t farlevel;
+    power_level_t nearlevel;
+    power_level_t linoutlevel;
+    power_level_t nlpoutlevel;
+
+    int metricsMode;
+    int stateCounter;
+    stats_t erl;
+    stats_t erle;
+    stats_t aNlp;
+    stats_t rerl;
+
+  
+    int delay_histogram[kHistorySizeBlocks];
+  
+    void* delay_estimator;
+	int knownDelay;
+
+} statistical_aec_t;
+
+#endif
 typedef void (*WebRtcAec_FilterFar_t)(aec_t *aec, float yf[2][PART_LEN1]);
 extern WebRtcAec_FilterFar_t WebRtcAec_FilterFar;
 typedef void (*WebRtcAec_ScaleErrorSignal_t)(aec_t *aec, float ef[2][PART_LEN1]);
@@ -180,6 +259,11 @@ int WebRtcAec_FreeAec(aec_t *aec);
 int WebRtcAec_InitAec(aec_t *aec, int sampFreq);
 void WebRtcAec_InitAec_SSE2(void);
 
+#if (DITECH_VERSION==2)
+int WebRtcAec_CreateAecStatistical(statistical_aec_t **aecInst);
+int WebRtcAec_FreeAecStatistical(statistical_aec_t *stats_aec);
+#endif
+
 void WebRtcAec_InitMetrics(aec_t *aec);
 #if (DITECH_VERSION==1)
 void WebRtcAec_ProcessFrame(aec_t *aec, const short *farend,
@@ -192,6 +276,8 @@ void WebRtcAec_ProcessFrame(aec_t *aec, const short *farend,
                        const short *nearend, const short *nearendH,
                        short *out, short *outH,
                        int knownDelay,short vadState);
+void WebRtcAec_ProcessFrame_Statistical(statistical_aec_t *aec_s, const short *farend,
+                       const short *nearend,aec_t *aec);
 #else
 #error DITECH_VERSION undefined
 #endif
