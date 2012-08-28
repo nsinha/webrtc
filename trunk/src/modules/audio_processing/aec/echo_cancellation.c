@@ -305,12 +305,9 @@ WebRtc_Word32 WebRtcAec_Init(void *aecInst, WebRtc_Word32 sampFreq, WebRtc_Word3
 
 #if (DITECH_VERSION==1)
 	aecpc->ECstartup = 1;
-#else
+#endif
 #if (DITECH_VERSION==2)
 	aecpc->ECstartup = 0;//nsinha		
-#else
-#error DITECH_VERSION undefined
-#endif
 #endif
     
     aecpc->bufSizeStart = 0;
@@ -342,7 +339,7 @@ WebRtc_Word32 WebRtcAec_Init(void *aecInst, WebRtc_Word32 sampFreq, WebRtc_Word3
 }
 
 #if (DITECH_VERSION==1)
-#else
+#endif
 #if (DITECH_VERSION==2)
 void WebRtcAec_set_processing_discontinuity(void *aecInst,short state)
 {
@@ -355,9 +352,6 @@ void WebRtcAec_set_processing_discontinuity(void *aecInst,short state)
 
 
 }		
-#else
-#error DITECH_VERSION undefined
-#endif
 #endif
 // only buffer L band for farend
 WebRtc_Word32 WebRtcAec_BufferFarend(void *aecInst, const WebRtc_Word16 *farend,
@@ -632,6 +626,7 @@ WebRtc_Word32 WebRtcAec_Process(void *aecInst, const WebRtc_Word16 *nearend,
 					WebRtcApm_WriteBuffer(aecpc->vadBuffer, farend, FRAME_LEN);
 					WebRtcApm_WriteBuffer(aecpc->vadBuffer_nearEnd,&nearend[FRAME_LEN * i], FRAME_LEN);
 				}
+#if 0
 				//do vad on near and far end
 				{
 
@@ -684,6 +679,7 @@ WebRtc_Word32 WebRtcAec_Process(void *aecInst, const WebRtc_Word16 *nearend,
 					estimate_delay_on_vad_corr(aecpc);
 
 				}
+#endif
 			}
 
 #endif
@@ -691,23 +687,20 @@ WebRtc_Word32 WebRtcAec_Process(void *aecInst, const WebRtc_Word16 *nearend,
             // Call the AEC
            WebRtcAec_ProcessFrame(aecpc->aec, farend, &nearend[FRAME_LEN * i], &nearendH[FRAME_LEN * i],
                &out[FRAME_LEN * i], &outH[FRAME_LEN * i], aecpc->knownDelay);
-#else
+#endif
 #if (DITECH_VERSION==2)
 			
 		  //aecpc->knownDelay=720;
-		  WebRtcAec_ProcessFrame_Statistical(aecpc->stats_aec, farend, &nearend[FRAME_LEN * i],aecpc->aec);
+		  //WebRtcAec_ProcessFrame_Statistical(aecpc->stats_aec, farend, &nearend[FRAME_LEN * i],aecpc->aec);
 		  if(aecpc->stats_aec->processed_known_delay>=0)
 		  {
-			  aecpc->knownDelay=(aecpc->stats_aec->processed_known_delay*8);
+			  aecpc->aec->knownDelay_background=(aecpc->stats_aec->processed_known_delay*8);
 		  }
 
 		  WebRtcAec_ProcessFrame(aecpc->aec, farend, &nearend[FRAME_LEN * i], &nearendH[FRAME_LEN * i],
-               &out[FRAME_LEN * i], &outH[FRAME_LEN * i], aecpc->knownDelay,aecpc->vadCntr);
+               &out[FRAME_LEN * i], &outH[FRAME_LEN * i], aecpc->stats_aec->last_known_delay*8,aecpc->vadCntr);
 		  
 
-#else
-#error DITECH_VERSION undefined
-#endif
 #endif
         }
     }
@@ -1026,12 +1019,9 @@ static int EstBufDelay(aecpc_t *aecpc, short msInSndCardBuf)
     nSampSndCard = msInSndCardBuf * sampMsNb * aecpc->aec->mult;
 #if (DITECH_VERSION==1)
 	delayNew = nSampSndCard - nSampFar;
-#else
+#endif
 #if (DITECH_VERSION==2)
 	delayNew = 0;//nSampSndCard - nSampFar;		
-#else
-#error DITECH_VERSION undefined
-#endif
 #endif
 
     
@@ -1045,24 +1035,16 @@ static int EstBufDelay(aecpc_t *aecpc, short msInSndCardBuf)
 #if (DITECH_VERSION==1)
 		WebRtcApm_FlushBuffer(aecpc->farendBuf, FRAME_LEN);
 		delayNew += FRAME_LEN;
-#else
-#if (DITECH_VERSION==2)
-		
-#else
-#error DITECH_VERSION undefined
 #endif
-#endif
+
 
         
     }
 #if (DITECH_VERSION==1)
     aecpc->filtDelay = WEBRTC_SPL_MAX(0, (short)(0.8*aecpc->filtDelay + 0.2*delayNew));
-#else
+#endif
 #if (DITECH_VERSION==2)
 	aecpc->filtDelay =0;
-#else
-#error DITECH_VERSION undefined
-#endif
 #endif
 
     diff = aecpc->filtDelay - aecpc->knownDelay;
@@ -1100,15 +1082,13 @@ static int DelayComp(aecpc_t *aecpc)
 
     nSampFar = WebRtcApm_get_buffer_size(aecpc->farendBuf);
     nSampSndCard = aecpc->msInSndCardBuf * sampMsNb * aecpc->aec->mult;
-#if (DITECH_VERSION==2)
-	delayNew =0;
-#else
 #if (DITECH_VERSION==1)
 	delayNew = nSampSndCard - nSampFar;		
-#else
-#error DITECH_VERSION undefined
 #endif
+#if (DITECH_VERSION==2)
+	delayNew =0;
 #endif
+
 
     
 
@@ -1126,14 +1106,8 @@ static int DelayComp(aecpc_t *aecpc)
 
 #if (DITECH_VERSION==1)
 	WebRtcApm_StuffBuffer(aecpc->farendBuf, nSampAdd);
-#else
-#if (DITECH_VERSION==2)
-		
-#else
-#error DITECH_VERSION undefined
 #endif
-#endif
-        
+
 
         aecpc->delayChange = 1; // the delay needs to be updated
     }

@@ -438,13 +438,11 @@ int AudioProcessingImpl::AnalyzeReverseStream(AudioFrame* frame) {
   if (err != kNoError) {
     return err;
   }
-#else
+#endif
 #if (DITECH_VERSION==2)
 //nsinha disables this buffering as we need to buffer what we spout to the speaker right at the end and not here
 		
-#else
-#error DITECH_VERSION undefined
-#endif
+
 #endif
 
 
@@ -462,8 +460,7 @@ int AudioProcessingImpl::AnalyzeReverseStream(AudioFrame* frame) {
   return err;  // TODO(ajm): this is for returning warnings; necessary?
 }
 
-#if (DITECH_VERSION==1)
-#else
+
 #if (DITECH_VERSION==2)
 void AudioProcessingImpl::set_processing_discontinuity(bool state){
 	echo_cancellation_->set_processing_discontinuity(state);
@@ -514,9 +511,6 @@ int AudioProcessingImpl::AnalyzeReverseStream_nsinha(AudioFrame* frame) {
 
   return err;
 }		
-#else
-#error DITECH_VERSION undefined
-#endif
 #endif
 int AudioProcessingImpl::set_stream_delay_ms(int delay) {
   was_stream_delay_set_ = true;

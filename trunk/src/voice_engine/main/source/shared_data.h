@@ -32,6 +32,10 @@ class OutputMixer;
 class SharedData
 
 {
+public:
+#if (DITECH_VERSION==1 || DITECH_VERSION==2)
+	FILE *shared_farendFileat48k;
+#endif
 protected:
     WebRtc_UWord16 NumOfSendingChannels();
 protected:

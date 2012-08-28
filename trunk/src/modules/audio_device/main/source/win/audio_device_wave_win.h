@@ -13,6 +13,7 @@
 
 #include "audio_device_generic.h"
 #include "audio_mixer_manager_win.h"
+#include "stdio.h"
 
 #pragma comment( lib, "winmm.lib" )
 
@@ -24,8 +25,10 @@ const WebRtc_UWord32 TIMER_PERIOD_MS = 2;
 const WebRtc_UWord32 REC_CHECK_TIME_PERIOD_MS = 4;
 const WebRtc_UWord16 REC_PUT_BACK_DELAY = 4;
 
+
 const WebRtc_UWord32 N_REC_SAMPLES_PER_SEC = 48000;
 const WebRtc_UWord32 N_PLAY_SAMPLES_PER_SEC = 48000;
+
 
 const WebRtc_UWord32 N_REC_CHANNELS = 1;  // default is mono recording
 const WebRtc_UWord32 N_PLAY_CHANNELS = 2; // default is stereo playout
@@ -42,7 +45,9 @@ class AudioDeviceWindowsWave : public AudioDeviceGeneric
 public:
     AudioDeviceWindowsWave(const WebRtc_Word32 id);
     ~AudioDeviceWindowsWave();
-
+#if (DITECH_VERSION==2)
+	FILE *shared_farendrecord,*shared_nearendrecord;
+#endif
     // Retrieve the currently utilized audio layer
     virtual WebRtc_Word32 ActiveAudioLayer(AudioDeviceModule::AudioLayer& audioLayer) const;
 
@@ -181,12 +186,14 @@ private:
     WebRtc_Word32 PrepareStartPlayout();
 #if (DITECH_VERSION==1)
     WebRtc_Word32 RecProc(LONGLONG& consumedTime);
-#else
+#endif
 #if (DITECH_VERSION==2)
 	WebRtc_Word32 RecProc(LONGLONG& consumedTime,WebRtc_UWord32 lastCallDiff);
-#else
-#error DITECH_VERSION UNDEFINED
-#endif
+	void synchronizePlayProc();
+	void synchronizeRecProc();
+	int  dontrunPlayProc;
+	WebRtc_UWord16 _recBufCount_start;
+	bool synchronizedSend;
 #endif
 	
 

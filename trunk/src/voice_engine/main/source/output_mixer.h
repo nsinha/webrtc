@@ -71,15 +71,11 @@ public:
 
     WebRtc_Word32 SetAnonymousMixabilityStatus(MixerParticipant& participant,
                                                const bool mixable);
-#if (DITECH_VERSION==1)
+#if (DITECH_VERSION==1|| DITECH_VERSION==2)
 
-#else
-#if (DITECH_VERSION==2)
 	WebRtc_Word32 OutputMixer::GetAudioFrame(AudioFrame ** audioFrame);//nsinha a new fn		
-#else
-#error DITECH_VERSION undefined
 #endif
-#endif
+
 
     WebRtc_Word32 GetMixedAudio(const WebRtc_Word32 desiredFreqHz,
                                 const WebRtc_UWord8 channels,

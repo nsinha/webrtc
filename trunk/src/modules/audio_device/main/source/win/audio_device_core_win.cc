@@ -3829,12 +3829,9 @@ DWORD AudioDeviceWindowsCore::DoCaptureThreadPollDMO()
                     kSamplesProduced);
 #if (DITECH_VERSION==1)
                 _ptrAudioBuffer->SetVQEData(0, 0, 0);
-#else
+#endif
 #if (DITECH_VERSION==2)
 				_ptrAudioBuffer->SetVQEData(0, 0, 0,0);//nsinha fourth arg for processing continuity
-#else
-#error DITECH_VERSION undefined	
-#endif
 #endif
 			
 
@@ -4090,12 +4087,9 @@ DWORD AudioDeviceWindowsCore::DoCaptureThread()
                         _driftAccumulator -= clockDrift;
 #if (DITECH_VERSION==1)
                         _ptrAudioBuffer->SetVQEData(_sndCardPlayDelay, sndCardRecDelay, clockDrift);
-#else
+#endif
 #if (DITECH_VERSION==2)
 						_ptrAudioBuffer->SetVQEData(_sndCardPlayDelay, sndCardRecDelay, clockDrift,0);//nsinha fourth arg for processing continuity
-#else
-#error DITECH_VERSION undefined	
-#endif
 #endif
 
                         QueryPerformanceCounter(&t1);    // measure time: START

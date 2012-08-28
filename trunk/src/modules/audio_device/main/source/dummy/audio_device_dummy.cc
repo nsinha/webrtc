@@ -1380,13 +1380,9 @@ bool AudioDeviceDummy::RecThreadProcess()
         // store vqe delay values
 #if (DITECH_VERSION==1)
         _ptrAudioBuffer->SetVQEData(0, 0, 0);
-#else
+#endif
 #if (DITECH_VERSION==2)
 		_ptrAudioBuffer->SetVQEData(0, 0, 0,0);//nsinha fourth arg for processing continuity
-#else
-#error DITECH_VERSION undefined
-
-#endif
 #endif
 	
 

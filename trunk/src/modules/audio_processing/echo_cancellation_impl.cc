@@ -70,8 +70,7 @@ EchoCancellationImpl::EchoCancellationImpl(const AudioProcessingImpl* apm)
     delay_logging_enabled_(false) {}
 
 EchoCancellationImpl::~EchoCancellationImpl() {}
-#if (DITECH_VERSION==1)
-#else
+
 #if (DITECH_VERSION==2)
 void EchoCancellationImpl::set_processing_discontinuity(bool state)
 {
@@ -84,9 +83,6 @@ void EchoCancellationImpl::set_processing_discontinuity(bool state)
 	  WebRtcAec_set_processing_discontinuity(my_handle,state);
 
 }		
-#else
-#error DITECH_VERSION undefined
-#endif
 #endif
 
 

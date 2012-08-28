@@ -60,7 +60,7 @@ public:
                                const WebRtc_Word32  clockDrift,
                                const WebRtc_UWord16 currentMicLevel);
 
-#else
+#endif
 #if (DITECH_VERSION==2)
 	WebRtc_Word32 PrepareDemux(const WebRtc_Word8* audioSamples,
                                const WebRtc_UWord32 nSamples,
@@ -69,9 +69,6 @@ public:
                                const WebRtc_UWord16 totalDelayMS,
                                const WebRtc_Word32  clockDrift,const bool processing_discontinuity,
                                const WebRtc_UWord16 currentMicLevel);
-#else
-#error DITECH_VERSION undefined
-#endif
 #endif
 
 
@@ -176,22 +173,19 @@ private:
 
     WebRtc_Word32 MixOrReplaceAudioWithFile(
         const int mixingFrequency);
+
+#if (DITECH_VERSION==1)
+	WebRtc_Word32 APMProcessStream(const WebRtc_UWord16 totalDelayMS,
+                                   const WebRtc_Word32 clockDrift,
+                                   const WebRtc_UWord16 currentMicLevel);
+#endif
 #if (DITECH_VERSION==2)
 	WebRtc_Word32 APMProcessStream(const WebRtc_UWord16 totalDelayMS,
                                    const WebRtc_Word32 clockDrift,const bool processing_discontinuity,
                                    const WebRtc_UWord16 currentMicLevel);
 
-#else
-#if (DITECH_VERSION==1)
-	WebRtc_Word32 APMProcessStream(const WebRtc_UWord16 totalDelayMS,
-                                   const WebRtc_Word32 clockDrift,
-                                   const WebRtc_UWord16 currentMicLevel);
-#else
-#error DITECH_VERSION undefined
-#endif
 #endif
 
-    
 #ifdef WEBRTC_VOICE_ENGINE_TYPING_DETECTION
     int TypingDetection();
 #endif

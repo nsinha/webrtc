@@ -47,6 +47,9 @@ SharedData::SharedData() :
                                                 _channelManager);
     }
     _audioDeviceLayer = AudioDeviceModule::kPlatformDefaultAudio;
+#if (DITECH_VERSION==1 || DITECH_VERSION==2)
+	shared_farendFileat48k=fopen("farendfileat48k.pcm","rb");
+#endif
 }
 
 SharedData::~SharedData()

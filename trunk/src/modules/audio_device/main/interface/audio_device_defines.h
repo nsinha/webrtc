@@ -65,7 +65,7 @@ public:
                                             const uint32_t currentMicLevel,
                                             uint32_t& newMicLevel) = 0;   
 
-#else
+#endif
 #if (DITECH_VERSION==2)
 	virtual int32_t RecordedDataIsAvailable(const char* audioSamples,
                                             const uint32_t nSamples,
@@ -76,9 +76,6 @@ public:
                                             const int32_t clockDrift,
                                             const uint32_t currentMicLevel,
                                             uint32_t& newMicLevel,const bool processing_discontinuity) = 0; 
-#else
-#error DITECH_VERSION UNDEFINED
-#endif
 #endif
     virtual int32_t NeedMorePlayData(const uint32_t nSamples,
                                      const uint8_t nBytesPerSample,

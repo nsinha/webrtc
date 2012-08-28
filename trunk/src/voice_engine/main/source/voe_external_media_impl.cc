@@ -294,7 +294,7 @@ int VoEExternalMediaImpl::ExternalRecordingInsertData(
             totalDelayMS,
             0,
             0);
-#else
+#endif
 #if (DITECH_VERSION==2)
 		_transmitMixerPtr->PrepareDemux(
             (const WebRtc_Word8*)(&speechData10ms[i*blockSize]),
@@ -305,9 +305,7 @@ int VoEExternalMediaImpl::ExternalRecordingInsertData(
             0,0,
             0);
 		
-#else
-#error DITECH_VERSION undefined
-#endif
+
 #endif
         _transmitMixerPtr->DemuxAndMix();
         _transmitMixerPtr->EncodeAndSend();

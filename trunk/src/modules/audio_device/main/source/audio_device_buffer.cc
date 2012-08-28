@@ -109,10 +109,6 @@ WebRtc_Word32 AudioDeviceBuffer::RegisterAudioCallback(AudioTransport* audioCall
 
     return 0;
 }
-
-// ----------------------------------------------------------------------------
-//  InitPlayout
-// ----------------------------------------------------------------------------
 #if (DITECH_VERSION==1)
 WebRtc_Word32 AudioDeviceBuffer::InitPlayout()
 {
@@ -128,7 +124,10 @@ WebRtc_Word32 AudioDeviceBuffer::InitPlayout()
 
     return 0;
 }
-#else
+#endif
+// ----------------------------------------------------------------------------
+//  InitPlayout
+// ----------------------------------------------------------------------------
 #if (DITECH_VERSION==2)
 WebRtc_Word32 AudioDeviceBuffer::InitPlayout()
 {
@@ -145,10 +144,8 @@ WebRtc_Word32 AudioDeviceBuffer::InitPlayout()
 	total10msticks=0;
     return 0;
 }
-#else
-#error DITECH_VERSION UNDEFINED
 #endif
-#endif
+
 
 
 // ----------------------------------------------------------------------------
@@ -169,7 +166,7 @@ WebRtc_Word32 AudioDeviceBuffer::InitRecording()
 
     return 0;
 }
-#else
+#endif
 #if (DITECH_VERSION==2)
 WebRtc_Word32 AudioDeviceBuffer::InitRecording()
 {
@@ -185,11 +182,7 @@ WebRtc_Word32 AudioDeviceBuffer::InitRecording()
 	totalRecordedSamples=0;
     return 0;
 }
-#else
-#error DITECH_VERSION UNDEFINED
 #endif
-#endif
-
 
 // ----------------------------------------------------------------------------
 //  SetRecordingSampleRate
@@ -363,7 +356,7 @@ WebRtc_Word32 AudioDeviceBuffer::SetVQEData(WebRtc_UWord32 playDelayMS, WebRtc_U
 
     return 0;
 }
-#else
+#endif
 #if (DITECH_VERSION==2)
 //nsinha brought processing discontinity change
 WebRtc_Word32 AudioDeviceBuffer::SetVQEData(WebRtc_UWord32 playDelayMS, WebRtc_UWord32 recDelayMS, WebRtc_Word32 clockDrift,WebRtc_UWord32 lastCallDiff)
@@ -380,9 +373,6 @@ WebRtc_Word32 AudioDeviceBuffer::SetVQEData(WebRtc_UWord32 playDelayMS, WebRtc_U
 
     return 0;
 }
-#else
-#error DITECH_VERSION undefined
-#endif
 #endif
 
 // ----------------------------------------------------------------------------
@@ -515,8 +505,8 @@ WebRtc_Word32 AudioDeviceBuffer::SetRecordedBuffer(const WebRtc_Word8* audioBuff
         // exctract left or right channel from input buffer to the local buffer
         for (WebRtc_UWord32 i = 0; i < _recSamples; i++)
         {
-#if !_DEBUG            
-	*ptr16Out = *ptr16In;
+#if 1            
+			*ptr16Out = *ptr16In;
 #else
 			*ptr16Out = preset_buffer_48k[i%96];
 #endif
@@ -596,7 +586,7 @@ WebRtc_Word32 AudioDeviceBuffer::DeliverRecordedData()
 
     return 0;
 }
-#else
+#endif
 #if (DITECH_VERSION==2)
 /*Nsinha This fn is modified to  calculate the recorded samples at generic audio driver level. This code gets hit in linux and
 windows*/
@@ -664,9 +654,7 @@ WebRtc_Word32 AudioDeviceBuffer::DeliverRecordedData()
 
     return 0;
 }
-#else
-#error DITECH_VERSION undefined
-#endif
+
 #endif
 // ----------------------------------------------------------------------------
 //  RequestPlayoutData
@@ -757,7 +745,7 @@ WebRtc_Word32 AudioDeviceBuffer::RequestPlayoutData(WebRtc_UWord32 nSamples)
 
     return nSamplesOut;
 }
-#else
+#endif
 #if (DITECH_VERSION==2)
 /*Nsinha This fn is modified to  calculate the playedOut samples at generic audio driver level. This code gets hit in linux and
 windows*/
@@ -863,9 +851,7 @@ WebRtc_Word32 AudioDeviceBuffer::RequestPlayoutData(WebRtc_UWord32 nSamples)
     return nSamplesOut;
 }
 
-#else
-#error DITECH_VERSION undefined
-#endif
+
 #endif
 
 // ----------------------------------------------------------------------------

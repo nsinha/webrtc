@@ -106,7 +106,7 @@ public:
                                 const WebRtc_UWord32 currentMicLevel,
                                 WebRtc_UWord32& newMicLevel);
 
-#else
+#endif
 #if (DITECH_VERSION==2)
     // AudioTransport
     virtual WebRtc_Word32
@@ -120,9 +120,7 @@ public:
                                 const WebRtc_UWord32 currentMicLevel,
                                 WebRtc_UWord32& newMicLevel,const bool processing_discontinuity);
 		
-#else
-#error DITECH_VERSION undefined
-#endif
+
 #endif
 
 

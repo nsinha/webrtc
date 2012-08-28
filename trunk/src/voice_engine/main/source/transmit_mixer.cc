@@ -296,129 +296,7 @@ TransmitMixer::SetAudioProcessingModule(AudioProcessing* audioProcessingModule)
     _audioProcessingModulePtr = audioProcessingModule;
     return 0;
 }
-#if (DITECH_VERSION==2)
-WebRtc_Word32 
-TransmitMixer::PrepareDemux(const WebRtc_Word8* audioSamples,
-                            const WebRtc_UWord32 nSamples,
-                            const WebRtc_UWord8 nChannels,
-                            const WebRtc_UWord32 samplesPerSec,
-                            const WebRtc_UWord16 totalDelayMS,
-                            const WebRtc_Word32 clockDrift,const bool processing_discontinuity,
-                            const WebRtc_UWord16 currentMicLevel)
-{
-    WEBRTC_TRACE(kTraceStream, kTraceVoice, VoEId(_instanceId, -1),
-                 "TransmitMixer::PrepareDemux(nSamples=%u, nChannels=%u,"
-                 "samplesPerSec=%u, totalDelayMS=%u, clockDrift=%u,"
-                 "currentMicLevel=%u)", nSamples, nChannels, samplesPerSec,
-                 totalDelayMS, clockDrift, currentMicLevel);
 
-
-    const int mixingFrequency = _mixingFrequency;
-
-    ScopedChannel sc(*_channelManagerPtr);
-    void* iterator(NULL);
-    Channel* channelPtr = sc.GetFirstChannel(iterator);
-    _mixingFrequency = 8000;
-    while (channelPtr != NULL)
-    {
-        if (channelPtr->Sending())
-        {
-            CodecInst tmpCdc;
-            channelPtr->GetSendCodec(tmpCdc);
-            if (tmpCdc.plfreq > _mixingFrequency)
-                _mixingFrequency = tmpCdc.plfreq;
-        }
-        channelPtr = sc.GetNextChannel(iterator);
-    }
-
-
-    // --- Resample input audio and create/store the initial audio frame
-
-    if (GenerateAudioFrame((const WebRtc_Word16*) audioSamples,
-                           nSamples,
-                           nChannels,
-                           samplesPerSec,
-                           _mixingFrequency) == -1)
-    {
-        return -1;
-    }
-
-    // --- Near-end Voice Quality Enhancement (APM) processing
-
-    APMProcessStream(totalDelayMS, clockDrift,processing_discontinuity, currentMicLevel);
-
-    // --- Annoying typing detection (utilizes the APM/VAD decision)
-
-#ifdef WEBRTC_VOICE_ENGINE_TYPING_DETECTION
-    TypingDetection();
-#endif
-
-    // --- Mute during DTMF tone if direct feedback is enabled
-
-    if (_remainingMuteMicTimeMs > 0)
-    {
-        AudioFrameOperations::Mute(_audioFrame);
-        _remainingMuteMicTimeMs -= 10;
-        if (_remainingMuteMicTimeMs < 0)
-        {
-            _remainingMuteMicTimeMs = 0;
-        }
-    }
-
-    // --- Mute signal
-
-    if (_mute)
-    {
-        AudioFrameOperations::Mute(_audioFrame);
-    }
-
-    // --- Measure audio level of speech after APM processing
-
-    _audioLevel.ComputeLevel(_audioFrame);
-
-    // --- Mix with file (does not affect the mixing frequency)
-
-    if (_filePlaying)
-    {
-        MixOrReplaceAudioWithFile(_mixingFrequency);
-    }
-
-    // --- Record to file
-
-    if (_fileRecording)
-    {
-        RecordAudioToFile(_mixingFrequency);
-    }
-
-    // --- External media processing
-
-    if (_externalMedia)
-    {
-        CriticalSectionScoped cs(_callbackCritSect);
-        const bool isStereo = (_audioFrame._audioChannel == 2);
-        if (_externalMediaCallbackPtr)
-        {
-            _externalMediaCallbackPtr->Process(
-                -1,
-                kRecordingAllChannelsMixed,
-                (WebRtc_Word16*) _audioFrame._payloadData,
-                _audioFrame._payloadDataLengthInSamples,
-                _audioFrame._frequencyInHz,
-                isStereo);
-        }
-    }
-
-    if (_mixingFrequency != mixingFrequency)
-    {
-        WEBRTC_TRACE(kTraceStream, kTraceVoice, VoEId(_instanceId, -1),
-                     "TransmitMixer::TransmitMixer::PrepareDemux() => "
-                     "mixing frequency = %d",
-                     _mixingFrequency);
-    }
-
-    return 0;
-}
-#else
 #if (DITECH_VERSION==1)
 WebRtc_Word32 
 TransmitMixer::PrepareDemux(const WebRtc_Word8* audioSamples,
@@ -542,12 +420,130 @@ TransmitMixer::PrepareDemux(const WebRtc_Word8* audioSamples,
     return 0;
 }
 
-		
-#else
-#error DITECH_VERSION undefined
 #endif
+#if (DITECH_VERSION==2)
+WebRtc_Word32 
+TransmitMixer::PrepareDemux(const WebRtc_Word8* audioSamples,
+                            const WebRtc_UWord32 nSamples,
+                            const WebRtc_UWord8 nChannels,
+                            const WebRtc_UWord32 samplesPerSec,
+                            const WebRtc_UWord16 totalDelayMS,
+                            const WebRtc_Word32 clockDrift,const bool processing_discontinuity,
+                            const WebRtc_UWord16 currentMicLevel)
+{
+    WEBRTC_TRACE(kTraceStream, kTraceVoice, VoEId(_instanceId, -1),
+                 "TransmitMixer::PrepareDemux(nSamples=%u, nChannels=%u,"
+                 "samplesPerSec=%u, totalDelayMS=%u, clockDrift=%u,"
+                 "currentMicLevel=%u)", nSamples, nChannels, samplesPerSec,
+                 totalDelayMS, clockDrift, currentMicLevel);
+
+
+    const int mixingFrequency = _mixingFrequency;
+
+    ScopedChannel sc(*_channelManagerPtr);
+    void* iterator(NULL);
+    Channel* channelPtr = sc.GetFirstChannel(iterator);
+    _mixingFrequency = 8000;
+    while (channelPtr != NULL)
+    {
+        if (channelPtr->Sending())
+        {
+            CodecInst tmpCdc;
+            channelPtr->GetSendCodec(tmpCdc);
+            if (tmpCdc.plfreq > _mixingFrequency)
+                _mixingFrequency = tmpCdc.plfreq;
+        }
+        channelPtr = sc.GetNextChannel(iterator);
+    }
+
+
+    // --- Resample input audio and create/store the initial audio frame
+
+    if (GenerateAudioFrame((const WebRtc_Word16*) audioSamples,
+                           nSamples,
+                           nChannels,
+                           samplesPerSec,
+                           _mixingFrequency) == -1)
+    {
+        return -1;
+    }
+
+    // --- Near-end Voice Quality Enhancement (APM) processing
+
+    APMProcessStream(totalDelayMS, clockDrift,processing_discontinuity, currentMicLevel);
+
+    // --- Annoying typing detection (utilizes the APM/VAD decision)
+
+#ifdef WEBRTC_VOICE_ENGINE_TYPING_DETECTION
+    TypingDetection();
 #endif
 
+    // --- Mute during DTMF tone if direct feedback is enabled
+
+    if (_remainingMuteMicTimeMs > 0)
+    {
+        AudioFrameOperations::Mute(_audioFrame);
+        _remainingMuteMicTimeMs -= 10;
+        if (_remainingMuteMicTimeMs < 0)
+        {
+            _remainingMuteMicTimeMs = 0;
+        }
+    }
+
+    // --- Mute signal
+
+    if (_mute)
+    {
+        AudioFrameOperations::Mute(_audioFrame);
+    }
+
+    // --- Measure audio level of speech after APM processing
+
+    _audioLevel.ComputeLevel(_audioFrame);
+
+    // --- Mix with file (does not affect the mixing frequency)
+
+    if (_filePlaying)
+    {
+        MixOrReplaceAudioWithFile(_mixingFrequency);
+    }
+
+    // --- Record to file
+
+    if (_fileRecording)
+    {
+        RecordAudioToFile(_mixingFrequency);
+    }
+
+    // --- External media processing
+
+    if (_externalMedia)
+    {
+        CriticalSectionScoped cs(_callbackCritSect);
+        const bool isStereo = (_audioFrame._audioChannel == 2);
+        if (_externalMediaCallbackPtr)
+        {
+            _externalMediaCallbackPtr->Process(
+                -1,
+                kRecordingAllChannelsMixed,
+                (WebRtc_Word16*) _audioFrame._payloadData,
+                _audioFrame._payloadDataLengthInSamples,
+                _audioFrame._frequencyInHz,
+                isStereo);
+        }
+    }
+
+    if (_mixingFrequency != mixingFrequency)
+    {
+        WEBRTC_TRACE(kTraceStream, kTraceVoice, VoEId(_instanceId, -1),
+                     "TransmitMixer::TransmitMixer::PrepareDemux() => "
+                     "mixing frequency = %d",
+                     _mixingFrequency);
+    }
+
+    return 0;
+}
+#endif
 WebRtc_Word32 
 TransmitMixer::DemuxAndMix()
 {
@@ -1392,6 +1388,87 @@ WebRtc_Word32 TransmitMixer::MixOrReplaceAudioWithFile(
     }
     return 0;
 }
+
+#if (DITECH_VERSION==1)
+WebRtc_Word32 TransmitMixer::APMProcessStream(
+    const WebRtc_UWord16 totalDelayMS,
+    const WebRtc_Word32 clockDrift,
+    const WebRtc_UWord16 currentMicLevel)
+{
+    WebRtc_UWord16 captureLevel(currentMicLevel);
+
+    // If the frequency has changed we need to change APM settings
+    // Sending side is "master"
+    if (_audioProcessingModulePtr->sample_rate_hz()
+        != _audioFrame._frequencyInHz)
+    {
+        if (_audioProcessingModulePtr->set_sample_rate_hz(
+            _audioFrame._frequencyInHz))
+        {
+            WEBRTC_TRACE(kTraceWarning, kTraceVoice, VoEId(_instanceId, -1),
+                         "AudioProcessingModule::set_sample_rate_hz("
+                         "_frequencyInHz=%u) => error",
+                         _audioFrame._frequencyInHz);
+        }
+    }
+
+    if (_audioProcessingModulePtr->set_stream_delay_ms(totalDelayMS) == -1)
+    {
+        WEBRTC_TRACE(kTraceWarning, kTraceVoice, VoEId(_instanceId, -1),
+                     "AudioProcessingModule::set_stream_delay_ms("
+                     "totalDelayMS=%u) => error",
+                     totalDelayMS);
+    }
+    if (_audioProcessingModulePtr->gain_control()->set_stream_analog_level(
+        captureLevel) == -1)
+    {
+        WEBRTC_TRACE(kTraceWarning, kTraceVoice, VoEId(_instanceId, -1),
+                   "AudioProcessingModule::set_stream_analog_level "
+                   "(captureLevel=%u,) => error",
+                   captureLevel);
+    }
+    if (_audioProcessingModulePtr->echo_cancellation()->
+        is_drift_compensation_enabled())
+    {
+        if (_audioProcessingModulePtr->echo_cancellation()->
+            set_stream_drift_samples(clockDrift) == -1)
+        {
+            WEBRTC_TRACE(kTraceWarning, kTraceVoice, VoEId(_instanceId, -1),
+                       "AudioProcessingModule::set_stream_drift_samples("
+                       "clockDrift=%u,) => error",
+                       clockDrift);
+        }
+    }
+    if (_audioProcessingModulePtr->ProcessStream(&_audioFrame) == -1)
+    {
+        WEBRTC_TRACE(kTraceWarning, kTraceVoice, VoEId(_instanceId, -1),
+                   "AudioProcessingModule::ProcessStream() => error");
+    }
+    captureLevel
+        = _audioProcessingModulePtr->gain_control()->stream_analog_level();
+
+    // Store new capture level (only updated when analog AGC is enabled)
+    _captureLevel = captureLevel;
+
+    // Log notifications
+    if (_audioProcessingModulePtr->gain_control()->stream_is_saturated())
+    {
+        if (_saturationWarning == 1)
+        {
+            WEBRTC_TRACE(kTraceWarning, kTraceVoice, VoEId(_instanceId, -1),
+                       "TransmitMixer::APMProcessStream() pending "
+                       "saturation warning exists");
+        }
+        _saturationWarning = 1; // triggers callback from moduleprocess thread
+        WEBRTC_TRACE(kTraceWarning, kTraceVoice, VoEId(_instanceId, -1),
+                   "TransmitMixer::APMProcessStream() VE_SATURATION_WARNING "
+                   "message has been posted for callback");
+    }
+
+    return 0;
+}		
+
+#endif
 #if (DITECH_VERSION==2)
 WebRtc_Word32 TransmitMixer::APMProcessStream(
     const WebRtc_UWord16 totalDelayMS,
@@ -1472,91 +1549,7 @@ WebRtc_Word32 TransmitMixer::APMProcessStream(
     return 0;
 }
 
-#else
-#if (DITECH_VERSION==1)
-WebRtc_Word32 TransmitMixer::APMProcessStream(
-    const WebRtc_UWord16 totalDelayMS,
-    const WebRtc_Word32 clockDrift,
-    const WebRtc_UWord16 currentMicLevel)
-{
-    WebRtc_UWord16 captureLevel(currentMicLevel);
-
-    // If the frequency has changed we need to change APM settings
-    // Sending side is "master"
-    if (_audioProcessingModulePtr->sample_rate_hz()
-        != _audioFrame._frequencyInHz)
-    {
-        if (_audioProcessingModulePtr->set_sample_rate_hz(
-            _audioFrame._frequencyInHz))
-        {
-            WEBRTC_TRACE(kTraceWarning, kTraceVoice, VoEId(_instanceId, -1),
-                         "AudioProcessingModule::set_sample_rate_hz("
-                         "_frequencyInHz=%u) => error",
-                         _audioFrame._frequencyInHz);
-        }
-    }
-
-	
-    if (_audioProcessingModulePtr->set_stream_delay_ms(totalDelayMS) == -1)
-    {
-        WEBRTC_TRACE(kTraceWarning, kTraceVoice, VoEId(_instanceId, -1),
-                     "AudioProcessingModule::set_stream_delay_ms("
-                     "totalDelayMS=%u) => error",
-                     totalDelayMS);
-    }
-    if (_audioProcessingModulePtr->gain_control()->set_stream_analog_level(
-        captureLevel) == -1)
-    {
-        WEBRTC_TRACE(kTraceWarning, kTraceVoice, VoEId(_instanceId, -1),
-                   "AudioProcessingModule::set_stream_analog_level "
-                   "(captureLevel=%u,) => error",
-                   captureLevel);
-    }
-    if (_audioProcessingModulePtr->echo_cancellation()->
-        is_drift_compensation_enabled())
-    {
-        if (_audioProcessingModulePtr->echo_cancellation()->
-            set_stream_drift_samples(clockDrift) == -1)
-        {
-            WEBRTC_TRACE(kTraceWarning, kTraceVoice, VoEId(_instanceId, -1),
-                       "AudioProcessingModule::set_stream_drift_samples("
-                       "clockDrift=%u,) => error",
-                       clockDrift);
-        }
-    }
-    if (_audioProcessingModulePtr->ProcessStream(&_audioFrame) == -1)
-    {
-        WEBRTC_TRACE(kTraceWarning, kTraceVoice, VoEId(_instanceId, -1),
-                   "AudioProcessingModule::ProcessStream() => error");
-    }
-    captureLevel
-        = _audioProcessingModulePtr->gain_control()->stream_analog_level();
-
-    // Store new capture level (only updated when analog AGC is enabled)
-    _captureLevel = captureLevel;
-
-    // Log notifications
-    if (_audioProcessingModulePtr->gain_control()->stream_is_saturated())
-    {
-        if (_saturationWarning == 1)
-        {
-            WEBRTC_TRACE(kTraceWarning, kTraceVoice, VoEId(_instanceId, -1),
-                       "TransmitMixer::APMProcessStream() pending "
-                       "saturation warning exists");
-        }
-        _saturationWarning = 1; // triggers callback from moduleprocess thread
-        WEBRTC_TRACE(kTraceWarning, kTraceVoice, VoEId(_instanceId, -1),
-                   "TransmitMixer::APMProcessStream() VE_SATURATION_WARNING "
-                   "message has been posted for callback");
-    }
-
-    return 0;
-}		
-#else
-#error DITECH_VERSION undefined
 #endif
-#endif
-
 
 #ifdef WEBRTC_VOICE_ENGINE_TYPING_DETECTION
 int TransmitMixer::TypingDetection()

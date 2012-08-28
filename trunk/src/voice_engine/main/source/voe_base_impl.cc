@@ -153,6 +153,15 @@ WebRtc_Word32 VoEBaseImpl::RecordedDataIsAvailable(
         const WebRtc_UWord32 currentMicLevel,
         WebRtc_UWord32& newMicLevel)
 {
+#if (DITECH_VERSION==1)
+	WEBRTC_TRACE(kTraceInfo, kTraceVoice, VoEId(_instanceId, -1),
+                 "VoEBaseImpl::RecordedDataIsAvailable(nSamples=%u, "
+                     "nBytesPerSample=%u, nChannels=%u, samplesPerSec=%u, "
+                     "totalDelayMS=%u, clockDrift=%d, currentMicLevel=%u)",
+                 nSamples, nBytesPerSample, nChannels, samplesPerSec,
+                 totalDelayMS, clockDrift, currentMicLevel);
+
+#endif
     WEBRTC_TRACE(kTraceStream, kTraceVoice, VoEId(_instanceId, -1),
                  "VoEBaseImpl::RecordedDataIsAvailable(nSamples=%u, "
                      "nBytesPerSample=%u, nChannels=%u, samplesPerSec=%u, "
@@ -289,7 +298,7 @@ WebRtc_Word32 VoEBaseImpl::NeedMorePlayData(
 
     return 0;
 }
-#else
+#endif
 #if (DITECH_VERSION==2)
 //nsinha change the fn to pass processing discontinuity
 WebRtc_Word32 VoEBaseImpl::RecordedDataIsAvailable(
@@ -455,6 +464,9 @@ WebRtc_Word32 VoEBaseImpl::NeedMorePlayData(
 				i+=buflenInBytes/2;
 		}
 #endif
+#if 1
+		fread(audioFrame_ptr->_payloadData,2,audioFrame_ptr->_payloadDataLengthInSamples,shared_farendFileat48k);
+#endif
 		apm->AnalyzeReverseStream_nsinha(audioFrame_ptr);
     }
 
@@ -476,9 +488,6 @@ WebRtc_Word32 VoEBaseImpl::NeedMorePlayData(
 
     return 0;
 }		
-#else
-#error DITECH_VERSION undefined
-#endif
 #endif
 
 

@@ -72,14 +72,26 @@ typedef struct {
 typedef struct {
     int farBufWritePos, farBufReadPos;
 
-    int knownDelay;
+	int knownDelay;
 #if (DITECH_VERSION==1)
-#else
+#endif
 #if (DITECH_VERSION==2)
 	int adaptIsOff;//nsinha this variable will control if adaptation of filter needs to de done.is turned off on discontinuity of time gap while calling.		
-#else
-#error DITECH_VERSION undefined
-#endif
+	
+	int knownDelay_background;
+	int last_knownDelay_background;
+	float xfBuf_background[2][NR_PART * PART_LEN1]; // farend fft buffer
+	float wfBuf_background[2][NR_PART * PART_LEN1]; // filter fft
+
+	float xBuf_background[PART_LEN2]; // farend
+    float dBuf_background[PART_LEN2]; // nearend
+    float eBuf_background[PART_LEN2]; // error
+	void *farFrBuf_background,*nearFrBuf_background,*outFrBuf_background;
+	int   xfBufBlockPos_background;
+	float background_lt_filteredop_power;
+	float foreground_lt_filteredop_power;
+	float lt_input_power;
+	float framePowerAtProbableEchoDelay_shortTerm;
 #endif
     int inSamples, outSamples;
     int delayEstCtr;
@@ -211,6 +223,7 @@ typedef struct {
 	float long_term_corr_buff_stats_cntr[HUNDRED_MS_IN_16K_DNS];
 	int known_delay;
 	int known_delay_less_confidence;
+	int last_known_delay;
 	int processed_known_delay;
 
     short mult; // sampling frequency multiple
@@ -270,7 +283,7 @@ void WebRtcAec_ProcessFrame(aec_t *aec, const short *farend,
                        const short *nearend, const short *nearendH,
                        short *out, short *outH,
                        int knownDelay);
-#else
+#endif
 #if (DITECH_VERSION==2)
 void WebRtcAec_ProcessFrame(aec_t *aec, const short *farend,
                        const short *nearend, const short *nearendH,
@@ -278,10 +291,15 @@ void WebRtcAec_ProcessFrame(aec_t *aec, const short *farend,
                        int knownDelay,short vadState);
 void WebRtcAec_ProcessFrame_Statistical(statistical_aec_t *aec_s, const short *farend,
                        const short *nearend,aec_t *aec);
-#else
-#error DITECH_VERSION undefined
 #endif
-#endif
+
+
+
+void foreground_background_aec_analysis(aec_t *aec);
+void BufferFar_Arraywise(aec_t *aec, const short *farend, int farLen);
+void FetchFar_Arraywise(aec_t *aec, short *farend, int farLen, int knownDelay);
+float frame_power(float *a,int size);
+float frame_power_short(short *a,int size);
 
 #endif // WEBRTC_MODULES_AUDIO_PROCESSING_AEC_MAIN_SOURCE_AEC_CORE_H_
 
