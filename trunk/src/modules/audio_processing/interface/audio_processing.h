@@ -172,9 +172,12 @@ class AudioProcessing : public Module {
   virtual int AnalyzeReverseStream(AudioFrame* frame) = 0;
 #if (DITECH_VERSION==1)
 #endif
-#if (DITECH_VERSION==2)
 
-  virtual int AnalyzeReverseStream_nsinha(AudioFrame* frame) = 0;
+#if (DITECH_VERSION == DITECH_RELEASE_VERSION)
+  virtual int AnalyzeReverseStream_nsinha(AudioFrame* frame) =0;
+#endif
+#if (DITECH_VERSION==2)
+  virtual int AnalyzeReverseStream_nsinha(AudioFrame* frame) =0;
   virtual void set_processing_discontinuity(bool)=0;
 		
 #endif

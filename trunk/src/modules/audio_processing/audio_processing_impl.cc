@@ -432,14 +432,14 @@ int AudioProcessingImpl::AnalyzeReverseStream(AudioFrame* frame) {
                               render_audio_->analysis_filter_state2(i));
     }
   }
-#if (DITECH_VERSION==1)
+#if (DITECH_VERSION==DITECH_ORIGINAL|| DITECH_VERSION==DITECH_RELEASE_VERSION)
   // TODO(ajm): warnings possible from components?
   err = echo_cancellation_->ProcessRenderAudio(render_audio_);
   if (err != kNoError) {
     return err;
   }
 #endif
-#if (DITECH_VERSION==2)
+#if (DITECH_VERSION==2 )
 //nsinha disables this buffering as we need to buffer what we spout to the speaker right at the end and not here
 		
 
@@ -460,7 +460,54 @@ int AudioProcessingImpl::AnalyzeReverseStream(AudioFrame* frame) {
   return err;  // TODO(ajm): this is for returning warnings; necessary?
 }
 
+#if DITECH_VERSION==DITECH_RELEASE_VERSION
+int AudioProcessingImpl::AnalyzeReverseStream_nsinha(AudioFrame* frame) {
+  CriticalSectionScoped crit_scoped(*crit_);
+  int err = kNoError;
 
+  if (frame == NULL) {
+    return kNullPointerError;
+  }
+
+  if (frame->_frequencyInHz != sample_rate_hz_) {
+    return kBadSampleRateError;
+  }
+
+  if (frame->_audioChannel != num_reverse_channels_) {
+    return kBadNumberChannelsError;
+  }
+
+  if (frame->_payloadDataLengthInSamples != samples_per_channel_) {
+    return kBadDataLengthError;
+  }
+
+
+
+  render_audio_->DeinterleaveFrom(frame);
+
+  // TODO(ajm): turn the splitting filter into a component?
+  if (sample_rate_hz_ == kSampleRate32kHz) {
+    for (int i = 0; i < num_reverse_channels_; i++) {
+      // Split into low and high band.
+      SplittingFilterAnalysis(render_audio_->data(i),
+                              render_audio_->low_pass_split_data(i),
+                              render_audio_->high_pass_split_data(i),
+                              render_audio_->analysis_filter_state1(i),
+                              render_audio_->analysis_filter_state2(i));
+    }
+  }
+
+  // TODO(ajm): warnings possible from components?
+  err = echo_cancellation_->ProcessRenderAudio(render_audio_);
+  if (err != kNoError) {
+    return err;
+  }
+
+  return err;
+}		
+
+
+#endif
 #if (DITECH_VERSION==2)
 void AudioProcessingImpl::set_processing_discontinuity(bool state){
 	echo_cancellation_->set_processing_discontinuity(state);

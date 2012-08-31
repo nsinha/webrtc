@@ -513,7 +513,7 @@ int OutputMixer::StopRecordingPlayout()
     return 0;
 }
 
-#if (DITECH_VERSION==1|| DITECH_VERSION==2)
+#if (DITECH_VERSION==1|| DITECH_VERSION==2 || DITECH_VERSION==DITECH_RELEASE_VERSION)
 //nsinha a new fn
 WebRtc_Word32 
 OutputMixer::GetAudioFrame(AudioFrame ** audioFrame)

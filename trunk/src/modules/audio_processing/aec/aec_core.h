@@ -24,10 +24,15 @@
 #define PART_LEN 64 // Length of partition
 #define PART_LEN1 (PART_LEN + 1) // Unique fft coefficients
 #define PART_LEN2 (PART_LEN * 2) // Length of partition * 2
-#define NR_PART 12 // Number of partitions
+#if (DITECH_VERSION==DITECH_ORIGINAL)
+#define NR_PART 12
+#endif
+#if (DITECH_VERSION==DITECH_RELEASE_VERSION || DITECH_VERSION==2)
+#define NR_PART 6 // Number of partitions
+#endif
 #define FILT_LEN (PART_LEN * NR_PART) // Filter length
 #define FILT_LEN2 (FILT_LEN * 2) // Double filter length
-#define FAR_BUF_LEN (FILT_LEN2 * 2)
+#define FAR_BUF_LEN 12*64*4//(FILT_LEN2 * 2)
 #define PREF_BAND_SIZE 24
 
 // Delay estimator constants, used for logging.
@@ -133,8 +138,14 @@ typedef struct {
     short divergeState;
 
     int xfBufBlockPos;
+#if (DITECH_VERSION==DITECH_ORIGINAL)
 
     short farBuf[FILT_LEN2 * 2];
+#endif
+
+#if (DITECH_VERSION==2 || DITECH_VERSION==DITECH_RELEASE_VERSION)
+	short farBuf[FAR_BUF_LEN];
+#endif
 
     short mult; // sampling frequency multiple
     int sampFreq;

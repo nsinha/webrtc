@@ -317,7 +317,7 @@ static void ScaleErrorSignal(aec_t *aec, float ef[2][PART_LEN1])
 //    }
 //  }
 //}
-#if (DITECH_VERSION==1)
+#if (DITECH_VERSION==DITECH_ORIGINAL)
 static void FilterAdaptation(aec_t *aec, float *fft, float ef[2][PART_LEN1]) {
   int i, j;
   for (i = 0; i < NR_PART; i++) {
@@ -370,7 +370,7 @@ static void FilterAdaptation(aec_t *aec, float *fft, float ef[2][PART_LEN1]) {
 #endif
 }
 #endif
-#if (DITECH_VERSION==2)
+#if (DITECH_VERSION==DITECH_RELEASE_VERSION)
 static void FilterAdaptation(aec_t *aec, float *fft, float ef[2][PART_LEN1]) {
   int i, j;
   for (i = 0; i < NR_PART; i++) {

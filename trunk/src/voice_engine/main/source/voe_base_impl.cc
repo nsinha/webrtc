@@ -141,7 +141,7 @@ void VoEBaseImpl::OnWarningIsReported(const WarningCode warning)
         }
     }
 }
-#if (DITECH_VERSION==1)
+#if (DITECH_VERSION==DITECH_ORIGINAL)
 WebRtc_Word32 VoEBaseImpl::RecordedDataIsAvailable(
         const WebRtc_Word8* audioSamples,
         const WebRtc_UWord32 nSamples,
@@ -153,15 +153,6 @@ WebRtc_Word32 VoEBaseImpl::RecordedDataIsAvailable(
         const WebRtc_UWord32 currentMicLevel,
         WebRtc_UWord32& newMicLevel)
 {
-#if (DITECH_VERSION==1)
-	WEBRTC_TRACE(kTraceInfo, kTraceVoice, VoEId(_instanceId, -1),
-                 "VoEBaseImpl::RecordedDataIsAvailable(nSamples=%u, "
-                     "nBytesPerSample=%u, nChannels=%u, samplesPerSec=%u, "
-                     "totalDelayMS=%u, clockDrift=%d, currentMicLevel=%u)",
-                 nSamples, nBytesPerSample, nChannels, samplesPerSec,
-                 totalDelayMS, clockDrift, currentMicLevel);
-
-#endif
     WEBRTC_TRACE(kTraceStream, kTraceVoice, VoEId(_instanceId, -1),
                  "VoEBaseImpl::RecordedDataIsAvailable(nSamples=%u, "
                      "nBytesPerSample=%u, nChannels=%u, samplesPerSec=%u, "
@@ -279,6 +270,177 @@ WebRtc_Word32 VoEBaseImpl::NeedMorePlayData(
 
     // Additional operations on the combined signal
     _outputMixerPtr->DoOperationsOnCombinedSignal();
+
+    // Retrieve the final output mix (resampled to match the ADM)
+    _outputMixerPtr->GetMixedAudio(samplesPerSec, nChannels, audioFrame);
+
+    assert(nSamples == audioFrame._payloadDataLengthInSamples);
+    assert(samplesPerSec ==
+        static_cast<WebRtc_UWord32>(audioFrame._frequencyInHz));
+
+    // Deliver audio (PCM) samples to the ADM
+    memcpy(
+           (WebRtc_Word16*) audioSamples,
+           (const WebRtc_Word16*) audioFrame._payloadData,
+           sizeof(WebRtc_Word16) * (audioFrame._payloadDataLengthInSamples
+                   * audioFrame._audioChannel));
+
+    nSamplesOut = audioFrame._payloadDataLengthInSamples;
+
+    return 0;
+}
+#endif
+
+
+#if ( DITECH_VERSION==DITECH_RELEASE_VERSION)
+WebRtc_Word32 VoEBaseImpl::RecordedDataIsAvailable(
+        const WebRtc_Word8* audioSamples,
+        const WebRtc_UWord32 nSamples,
+        const WebRtc_UWord8 nBytesPerSample,
+        const WebRtc_UWord8 nChannels,
+        const WebRtc_UWord32 samplesPerSec,
+        const WebRtc_UWord32 totalDelayMS,
+        const WebRtc_Word32 clockDrift,
+        const WebRtc_UWord32 currentMicLevel,
+        WebRtc_UWord32& newMicLevel)
+{
+
+	WEBRTC_TRACE(kTraceInfo, kTraceVoice, VoEId(_instanceId, -1),
+                 "VoEBaseImpl::RecordedDataIsAvailable(nSamples=%u, "
+                     "nBytesPerSample=%u, nChannels=%u, samplesPerSec=%u, "
+                     "totalDelayMS=%u, clockDrift=%d, currentMicLevel=%u)",
+                 nSamples, nBytesPerSample, nChannels, samplesPerSec,
+                 totalDelayMS, clockDrift, currentMicLevel);
+
+    WEBRTC_TRACE(kTraceStream, kTraceVoice, VoEId(_instanceId, -1),
+                 "VoEBaseImpl::RecordedDataIsAvailable(nSamples=%u, "
+                     "nBytesPerSample=%u, nChannels=%u, samplesPerSec=%u, "
+                     "totalDelayMS=%u, clockDrift=%d, currentMicLevel=%u)",
+                 nSamples, nBytesPerSample, nChannels, samplesPerSec,
+                 totalDelayMS, clockDrift, currentMicLevel);
+
+    assert(_transmitMixerPtr != NULL);
+    assert(_audioDevicePtr != NULL);
+
+    bool isAnalogAGC(false);
+    WebRtc_UWord32 maxVolume(0);
+    WebRtc_UWord16 currentVoEMicLevel(0);
+    WebRtc_UWord32 newVoEMicLevel(0);
+
+    if (_audioProcessingModulePtr
+            && (_audioProcessingModulePtr->gain_control()->mode()
+                    == GainControl::kAdaptiveAnalog))
+    {
+        isAnalogAGC = true;
+    }
+
+    // Will only deal with the volume in adaptive analog mode
+    if (isAnalogAGC)
+    {
+        // Scale from ADM to VoE level range
+        if (_audioDevicePtr->MaxMicrophoneVolume(&maxVolume) == 0)
+        {
+            if (0 != maxVolume)
+            {
+                currentVoEMicLevel = (WebRtc_UWord16) ((currentMicLevel
+                        * kMaxVolumeLevel + (int) (maxVolume / 2))
+                        / (maxVolume));
+            }
+        }
+        // We learned that on certain systems (e.g Linux) the currentVoEMicLevel
+        // can be greater than the maxVolumeLevel therefore
+        // we are going to cap the currentVoEMicLevel to the maxVolumeLevel
+        // if it turns out that the currentVoEMicLevel is indeed greater
+        // than the maxVolumeLevel
+        if (currentVoEMicLevel > kMaxVolumeLevel)
+        {
+            currentVoEMicLevel = kMaxVolumeLevel;
+        }
+    }
+
+    // Keep track if the MicLevel has been changed by the AGC, if not,
+    // use the old value AGC returns to let AGC continue its trend,
+    // so eventually the AGC is able to change the mic level. This handles
+    // issues with truncation introduced by the scaling.
+    if (_oldMicLevel == currentMicLevel)
+    {
+        currentVoEMicLevel = (WebRtc_UWord16) _oldVoEMicLevel;
+    }
+
+    // Perform channel-independent operations
+    // (APM, mix with file, record to file, mute, etc.)
+    _transmitMixerPtr->PrepareDemux(audioSamples, nSamples, nChannels,
+                                    samplesPerSec,
+                                    (WebRtc_UWord16) totalDelayMS, clockDrift,
+                                    currentVoEMicLevel);
+
+    // Copy the audio frame to each sending channel and perform
+    // channel-dependent operations (file mixing, mute, etc.) to prepare
+    // for encoding.
+    _transmitMixerPtr->DemuxAndMix();
+    // Do the encoding and packetize+transmit the RTP packet when encoding
+    // is done.
+    _transmitMixerPtr->EncodeAndSend();
+
+    // Will only deal with the volume in adaptive analog mode
+    if (isAnalogAGC)
+    {
+        // Scale from VoE to ADM level range
+        newVoEMicLevel = _transmitMixerPtr->CaptureLevel();
+        if (newVoEMicLevel != currentVoEMicLevel)
+        {
+            // Add (kMaxVolumeLevel/2) to round the value
+            newMicLevel = (WebRtc_UWord32) ((newVoEMicLevel * maxVolume
+                    + (int) (kMaxVolumeLevel / 2)) / (kMaxVolumeLevel));
+        }
+        else
+        {
+            // Pass zero if the level is unchanged
+            newMicLevel = 0;
+        }
+
+        // Keep track of the value AGC returns
+        _oldVoEMicLevel = newVoEMicLevel;
+        _oldMicLevel = currentMicLevel;
+    }
+
+    return 0;
+}
+
+WebRtc_Word32 VoEBaseImpl::NeedMorePlayData(
+        const WebRtc_UWord32 nSamples,
+        const WebRtc_UWord8 nBytesPerSample,
+        const WebRtc_UWord8 nChannels,
+        const WebRtc_UWord32 samplesPerSec,
+        WebRtc_Word8* audioSamples,
+        WebRtc_UWord32& nSamplesOut)
+{
+	AudioFrame *audioFrame_ptr=NULL;
+	AudioProcessing* apm;
+    WEBRTC_TRACE(kTraceStream, kTraceVoice, VoEId(_instanceId, -1),
+                 "VoEBaseImpl::NeedMorePlayData(nSamples=%u, "
+                     "nBytesPerSample=%d, nChannels=%d, samplesPerSec=%u)",
+                 nSamples, nBytesPerSample, nChannels, samplesPerSec);
+
+    assert(_outputMixerPtr != NULL);
+
+    AudioFrame audioFrame;
+
+    // Perform mixing of all active participants (channel-based mixing)
+    _outputMixerPtr->MixActiveChannels();
+
+    // Additional operations on the combined signal
+    _outputMixerPtr->DoOperationsOnCombinedSignal();
+	{
+		//void* my_handle = static_cast<void *>(handle(0));
+		apm=reinterpret_cast<AudioProcessing*> (_audioProcessingModulePtr);
+
+		
+		_outputMixerPtr->GetAudioFrame(& audioFrame_ptr);
+		//apm->AnalyzeReverseStream_nsinha(audioFrame_ptr);
+		
+
+	}
 
     // Retrieve the final output mix (resampled to match the ADM)
     _outputMixerPtr->GetMixedAudio(samplesPerSec, nChannels, audioFrame);

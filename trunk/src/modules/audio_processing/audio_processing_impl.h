@@ -67,7 +67,9 @@ class AudioProcessingImpl : public AudioProcessing {
   virtual int num_reverse_channels() const;
   virtual int ProcessStream(AudioFrame* frame);
   virtual int AnalyzeReverseStream(AudioFrame* frame);
-
+#if (DITECH_VERSION==DITECH_RELEASE_VERSION)
+  virtual int AnalyzeReverseStream_nsinha(AudioFrame* frame);
+#endif
 #if (DITECH_VERSION==2)
   virtual int AnalyzeReverseStream_nsinha(AudioFrame* frame);
   virtual void set_processing_discontinuity(bool);		

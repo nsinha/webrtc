@@ -189,10 +189,14 @@ private:
 #endif
 #if (DITECH_VERSION==2)
 	WebRtc_Word32 RecProc(LONGLONG& consumedTime,WebRtc_UWord32 lastCallDiff);
-	void synchronizePlayProc();
 	void synchronizeRecProc();
-	int  dontrunPlayProc;
 	WebRtc_UWord16 _recBufCount_start;
+	
+#endif
+#if (DITECH_VERSION==DITECH_RELEASE_VERSION || DITECH_VERSION==2)
+	void synchronizePlayProc();
+	
+	int  dontrunPlayProc;
 	bool synchronizedSend;
 #endif
 	
