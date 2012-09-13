@@ -12,9 +12,11 @@
  * Contains the API functions for the AEC.
  */
 #include "echo_cancellation.h"
+#if DITECH_VERSION == 2
 #include "anr_vad.h"
 #include "anr_const.h"
 #include"vad_process.h"
+#endif
 #include <math.h>
 //#ifdef WEBRTC_AEC_DEBUG_DUMP
 #include <stdio.h>

@@ -267,15 +267,10 @@
     <ClCompile Include="audio_processing\aec\aec_core.c" />
     <ClCompile Include="audio_processing\aec\aec_core_1.c" />
     <ClCompile Include="audio_processing\aec\aec_resampler.c" />
-    <ClCompile Include="audio_processing\aec\anr_tab.c" />
-    <ClCompile Include="audio_processing\aec\dsp_func.c" />
     <ClCompile Include="audio_processing\aec\echo_cancellation.c" />
     <ClCompile Include="audio_processing\aec\aec_rdft.c" />
     <ClCompile Include="audio_processing\aec\aec_core_sse2.c" />
     <ClCompile Include="audio_processing\aec\aec_rdft_sse2.c" />
-    <ClCompile Include="audio_processing\aec\rfft_flt.c" />
-    <ClCompile Include="audio_processing\aec\vad_flt.c" />
-    <ClCompile Include="audio_processing\aec\vad_process.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />

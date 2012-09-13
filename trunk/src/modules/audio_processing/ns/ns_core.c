@@ -17,7 +17,12 @@
 #include "windows_private.h"
 #include "fft4g.h"
 #include "signal_processing_library.h"
-
+#if (DITECH_VERSION==DITECH_RELEASE_VERSION)
+static void buffer_write(Buffer *buffer,float *inSpeech,int num);
+static void buffer_read(Buffer *buffer,float *outSpeech,int num);
+static void buffer_init(Buffer *buffer);
+static void upsample_lp_filter(short *buf,filter_state  *filter_s);
+#endif
 // Set Feature Extraction Parameters
 void WebRtcNs_set_feature_extraction_parameters(NSinst_t* inst) {
   //bin size of histogram
@@ -77,12 +82,22 @@ int WebRtcNs_InitCore(NSinst_t* inst, WebRtc_UWord32 fs) {
     return -1;
   }
 
+  memset(inst,0,sizeof(NSinst_t));
+
   // Initialization of struct
   if (fs == 8000 || fs == 16000 || fs == 32000) {
     inst->fs = fs;
   } else {
     return -1;
   }
+#if (DITECH_VERSION == DITECH_RELEASE_VERSION)
+  VAD_init_FLT(&inst->vadState);
+  ANR_FLT_init(&inst->anrState);
+  ANR_FLT_init(&inst->anrStateHc);
+  SYN_init_FLT(&inst->synState);
+  buffer_init(&inst->vadBuffer);
+  buffer_init(&inst->anrOutBuffer);
+#endif
   inst->windShift = 0;
   if (fs == 8000) {
     // We only support 10ms frames
@@ -714,6 +729,7 @@ void WebRtcNs_SpeechNoiseProb(NSinst_t* inst, float* probSpeechFinal, float* snr
   }
 }
 
+#if (DITECH_VERSION == DITECH_ORIGINAL)
 int WebRtcNs_ProcessCore(NSinst_t* inst,
                          short* speechFrame,
                          short* speechFrameHB,
@@ -1303,3 +1319,240 @@ int WebRtcNs_ProcessCore(NSinst_t* inst,
 
   return 0;
 }
+#endif
+
+
+
+
+#if (DITECH_VERSION==DITECH_RELEASE_VERSION)
+
+int WebRtcNs_ProcessCore(NSinst_t* inst,
+                         short* speechFrame,
+                         short* speechFrameHB,
+                         short* outFrame,
+                         short* outFrameHB)
+{
+	float process_buf[FFTLENGTH];
+	float inSpeech[160];
+	float outSpeech[160];
+	FLOAT EdB[NUM_CRITICAL_BAND];
+	float fmag[FFTLENGTH/2+1];
+
+	int i;
+
+
+
+	if(inst->fs==8000)
+	{
+		//run 10ms vad,anr
+		for(i=0;i<80;i++)
+			inSpeech[i]=speechFrame[i];
+
+		buffer_write(&inst->vadBuffer,inSpeech,80);
+		if(inst->vadBuffer.unreaddata>=160)
+		{
+			buffer_read(&inst->vadBuffer,inSpeech,160);//160 samples
+			inst->vadFlag=VAD_process_FLT(&inst->vadState, inSpeech, process_buf,fmag,EdB);
+			ANR_process_flt(&inst->anrState,inst->vadFlag,process_buf,fmag,&inst->anrStateHc);
+			SYN_process_FLT(&inst->synState,process_buf,outSpeech);
+			buffer_write(&inst->anrOutBuffer,outSpeech,160);
+		}
+		
+		buffer_read(&inst->anrOutBuffer,outSpeech,80);//80 samples
+
+		for(i=0;i<80;i++)
+			outFrame[i]=(short)outSpeech[i];
+
+		
+
+
+	}
+
+	if(inst->fs==16000)
+	{
+		//down sample input and run anr/vad
+		//run 10ms vad,anr
+		for(i=0;i<80;i++)
+			inSpeech[i]=speechFrame[2*i];
+
+		buffer_write(&inst->vadBuffer,inSpeech,80);
+		if(inst->vadBuffer.unreaddata>=160)
+		{
+			buffer_read(&inst->vadBuffer,inSpeech,160);//160 samples
+			inst->vadFlag=VAD_process_FLT(&inst->vadState, inSpeech, process_buf,fmag,EdB);
+			ANR_process_flt(&inst->anrState,inst->vadFlag,process_buf,fmag,&inst->anrStateHc);
+			SYN_process_FLT(&inst->synState,process_buf,outSpeech);
+			buffer_write(&inst->anrOutBuffer,outSpeech,160);
+		}
+		
+		buffer_read(&inst->anrOutBuffer,outSpeech,80);//80 samples
+
+		for(i=0;i<80;i++)
+		{
+				outFrame[2*i]=(short)outSpeech[i];
+				outFrame[2*i+1]=(short)outSpeech[i];
+		}
+
+		upsample_lp_filter(outFrame,&inst->filter_s);
+
+
+
+
+
+	}
+
+	if(inst->fs==32000)
+	{
+		//down sample input and run anr/vad and copy the Hband as it is
+		//down sample input and run anr/vad
+		//run 10ms vad,anr
+		for(i=0;i<80;i++)
+			inSpeech[i]=speechFrame[2*i];
+
+		buffer_write(&inst->vadBuffer,inSpeech,80);
+		if(inst->vadBuffer.unreaddata>=160)
+		{
+			buffer_read(&inst->vadBuffer,inSpeech,160);//160 samples
+			inst->vadFlag=VAD_process_FLT(&inst->vadState, inSpeech, process_buf,fmag,EdB);
+			ANR_process_flt(&inst->anrState,inst->vadFlag,process_buf,fmag,&inst->anrStateHc);
+			SYN_process_FLT(&inst->synState,process_buf,outSpeech);
+			buffer_write(&inst->anrOutBuffer,outSpeech,160);
+		}
+		
+		buffer_read(&inst->anrOutBuffer,outSpeech,80);//80 samples
+
+		for(i=0;i<80;i++)
+		{
+				outFrame[2*i]=(short)outSpeech[i];
+				outFrame[2*i+1]=0;
+		}
+
+
+
+	}
+
+
+
+
+	return 0;
+
+}
+
+static void buffer_init(Buffer *buffer)
+{
+	int i;
+	buffer->rdPtr=0;
+	buffer->wrPtr=0;
+	buffer->unreaddata=0;
+	for(i=0;i<160;i++)
+		buffer->data[i]=0;
+
+}
+static void buffer_write(Buffer *buffer,float *inSpeech,int num)
+{
+	int contiguouslocations_available_before_wrap_for_writeptr=0,i,inSpeech_cnt=0,remaining=0;
+	
+	contiguouslocations_available_before_wrap_for_writeptr= (160 - buffer->wrPtr);
+	
+	if(num<contiguouslocations_available_before_wrap_for_writeptr)
+	{
+
+		for(i=0;i<num;i++)
+		{
+			buffer->data[buffer->wrPtr++]=*inSpeech++;
+			buffer->unreaddata++;
+
+		}
+	}
+	else
+	{
+		for(i=0;i<contiguouslocations_available_before_wrap_for_writeptr;i++)
+		{
+			buffer->data[buffer->wrPtr++]=*inSpeech++;
+			buffer->unreaddata++;
+
+		}
+		buffer->wrPtr=0;
+		remaining=num-contiguouslocations_available_before_wrap_for_writeptr;
+		for(i=0;i<remaining;i++)
+		{
+			buffer->data[buffer->wrPtr++]=*inSpeech++;
+			buffer->unreaddata++;
+
+		}
+
+
+
+	}
+
+
+}
+
+
+static void buffer_read(Buffer *buffer,float *outSpeech,int num)
+{
+	int contiguouslocations_available_before_wrap_for_readptr=0,i,outSpeech_cnt=0,remaining=0;
+	
+	contiguouslocations_available_before_wrap_for_readptr= (160 - buffer->rdPtr);
+	memset(outSpeech,0,num*sizeof(float));
+	if(buffer->unreaddata<num)
+		return;
+	
+	if(num<contiguouslocations_available_before_wrap_for_readptr)
+	{
+
+		for(i=0;i<num;i++)
+		{
+			*outSpeech++=buffer->data[buffer->rdPtr++];
+			buffer->unreaddata--;
+
+		}
+	}
+	else
+	{
+		for(i=0;i<contiguouslocations_available_before_wrap_for_readptr;i++)
+		{
+			*outSpeech++=buffer->data[buffer->rdPtr++];
+			buffer->unreaddata--;
+
+		}
+		buffer->rdPtr=0;
+		remaining=num-contiguouslocations_available_before_wrap_for_readptr;
+		for(i=0;i<remaining;i++)
+		{
+			*outSpeech++=buffer->data[buffer->rdPtr++];
+			buffer->unreaddata--;
+
+		}
+
+
+
+	}
+
+
+}
+float b[3]={0.29289 ,0.58579 ,0.29289};
+float a[3]={1 ,-0,0.17157};
+
+static void upsample_lp_filter(short *buf,filter_state  *filter_s)
+{
+	int i;
+	float x0,x1,x2;
+	float y0,y1,y2;
+	
+	for(i=0;i<160;i++)
+	{
+		x0=buf[i];
+		y0= b[0]*x0+ b[1]*filter_s->x1+b[2]*filter_s->x2-a[1]*filter_s->y1-a[2]*filter_s->y2;
+		filter_s->x2=filter_s->x1;
+		filter_s->x1=x0;
+		filter_s->y2=filter_s->y1;
+		filter_s->y1=y0;
+		buf[i]=(short)y0;
+
+	}
+
+
+
+}
+#endif

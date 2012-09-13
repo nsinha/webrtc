@@ -441,7 +441,7 @@ bool WebRtcVoiceEngine::SetOptions(int options) {
   // NS and typing detection are always on, if supported.
   bool aec = (options & MediaEngineInterface::ECHO_CANCELLATION) ? true : false;
   bool agc = (options & MediaEngineInterface::AUTO_GAIN_CONTROL) ? true : false;
-  bool anc = true;
+  bool anc = (options & MediaEngineInterface::NOISE_SUPPRESSION) ? true : false;;
   aec=aec_on;
   agc=agc_on;
   anc=anc_on;
@@ -1011,9 +1011,13 @@ bool WebRtcVoiceEngine::SetConferenceMode(bool enable) {
                << " Conference Mode noise reduction";
 
   // We always configure noise suppression on, so just toggle the mode.
-  const webrtc::NsModes ns_mode = enable ? webrtc::kNsConference
+  bool anc;
+  webrtc::NsModes ns_mode;
+  voe_wrapper_->processing()->GetNsStatus(anc,ns_mode);
+  ns_mode = enable ? webrtc::kNsConference
                                          : webrtc::kNsDefault;
-  if (voe_wrapper_->processing()->SetNsStatus(true, ns_mode) == -1) {
+  
+  if (voe_wrapper_->processing()->SetNsStatus(anc, ns_mode) == -1) {
     LOG_RTCERR2(SetNsStatus, true, ns_mode);
     return false;
   }

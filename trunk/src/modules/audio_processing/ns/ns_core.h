@@ -12,6 +12,17 @@
 #define WEBRTC_MODULES_AUDIO_PROCESSING_NS_MAIN_SOURCE_NS_CORE_H_
 
 #include "defines.h"
+#if DITECH_VERSION==DITECH_RELEASE_VERSION
+#include "vad.h"
+#include "anr_vad.h"
+#include "anr_const.h"
+#include"vad_process.h"
+#include "anr_const.h"
+#include "anr_tab.h"
+#include "anr_auditory.h"
+#include "anr_process.h"
+#include "syn_process.h"
+#endif
 
 typedef struct NSParaExtract_t_ {
 
@@ -47,6 +58,21 @@ typedef struct NSParaExtract_t_ {
   int thresWeightSpecDiff;
 
 } NSParaExtract_t;
+
+#if DITECH_VERSION==DITECH_RELEASE_VERSION
+typedef struct Buffer
+{
+	int rdPtr;
+	int wrPtr;
+	short unreaddata;
+	float data[160];
+}Buffer;
+typedef struct filter_state
+{
+	float x1,x2,y1,y2;
+}filter_state;
+
+#endif
 
 typedef struct NSinst_t_ {
 
@@ -104,6 +130,17 @@ typedef struct NSinst_t_ {
   //quantities for high band estimate
   float           speechProbHB[HALF_ANAL_BLOCKL];     //final speech/noise prob: prior + LRT
   float           dataBufHB[ANAL_BLOCKL_MAX];         //buffering data for HB
+
+#if (DITECH_VERSION==2 || DITECH_VERSION==DITECH_RELEASE_VERSION)
+  VAD_STATE_FLT vadState;
+  ANR_STATE_FLT	anrState;
+  ANR_STATE_FLT	anrStateHc;
+  SYN_STATE_FLT	synState;
+  short vadFlag;
+  Buffer vadBuffer;
+  Buffer anrOutBuffer;
+  filter_state filter_s;
+#endif
 
 } NSinst_t;
 
